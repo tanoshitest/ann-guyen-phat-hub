@@ -9,8 +9,62 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VanChuyenRouteImport } from './routes/van-chuyen'
+import { Route as SanPhamRouteImport } from './routes/san-pham'
+import { Route as NhaCungCapRouteImport } from './routes/nha-cung-cap'
+import { Route as MuaHangRouteImport } from './routes/mua-hang'
+import { Route as LoaiChiPhiRouteImport } from './routes/loai-chi-phi'
+import { Route as KhachHangRouteImport } from './routes/khach-hang'
+import { Route as DonViVcRouteImport } from './routes/don-vi-vc'
+import { Route as ChiPhiRouteImport } from './routes/chi-phi'
+import { Route as BanHangRouteImport } from './routes/ban-hang'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VanChuyenRoute = VanChuyenRouteImport.update({
+  id: '/van-chuyen',
+  path: '/van-chuyen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SanPhamRoute = SanPhamRouteImport.update({
+  id: '/san-pham',
+  path: '/san-pham',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NhaCungCapRoute = NhaCungCapRouteImport.update({
+  id: '/nha-cung-cap',
+  path: '/nha-cung-cap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuaHangRoute = MuaHangRouteImport.update({
+  id: '/mua-hang',
+  path: '/mua-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoaiChiPhiRoute = LoaiChiPhiRouteImport.update({
+  id: '/loai-chi-phi',
+  path: '/loai-chi-phi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KhachHangRoute = KhachHangRouteImport.update({
+  id: '/khach-hang',
+  path: '/khach-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonViVcRoute = DonViVcRouteImport.update({
+  id: '/don-vi-vc',
+  path: '/don-vi-vc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChiPhiRoute = ChiPhiRouteImport.update({
+  id: '/chi-phi',
+  path: '/chi-phi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BanHangRoute = BanHangRouteImport.update({
+  id: '/ban-hang',
+  path: '/ban-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +73,158 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ban-hang': typeof BanHangRoute
+  '/chi-phi': typeof ChiPhiRoute
+  '/don-vi-vc': typeof DonViVcRoute
+  '/khach-hang': typeof KhachHangRoute
+  '/loai-chi-phi': typeof LoaiChiPhiRoute
+  '/mua-hang': typeof MuaHangRoute
+  '/nha-cung-cap': typeof NhaCungCapRoute
+  '/san-pham': typeof SanPhamRoute
+  '/van-chuyen': typeof VanChuyenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ban-hang': typeof BanHangRoute
+  '/chi-phi': typeof ChiPhiRoute
+  '/don-vi-vc': typeof DonViVcRoute
+  '/khach-hang': typeof KhachHangRoute
+  '/loai-chi-phi': typeof LoaiChiPhiRoute
+  '/mua-hang': typeof MuaHangRoute
+  '/nha-cung-cap': typeof NhaCungCapRoute
+  '/san-pham': typeof SanPhamRoute
+  '/van-chuyen': typeof VanChuyenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ban-hang': typeof BanHangRoute
+  '/chi-phi': typeof ChiPhiRoute
+  '/don-vi-vc': typeof DonViVcRoute
+  '/khach-hang': typeof KhachHangRoute
+  '/loai-chi-phi': typeof LoaiChiPhiRoute
+  '/mua-hang': typeof MuaHangRoute
+  '/nha-cung-cap': typeof NhaCungCapRoute
+  '/san-pham': typeof SanPhamRoute
+  '/van-chuyen': typeof VanChuyenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ban-hang'
+    | '/chi-phi'
+    | '/don-vi-vc'
+    | '/khach-hang'
+    | '/loai-chi-phi'
+    | '/mua-hang'
+    | '/nha-cung-cap'
+    | '/san-pham'
+    | '/van-chuyen'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ban-hang'
+    | '/chi-phi'
+    | '/don-vi-vc'
+    | '/khach-hang'
+    | '/loai-chi-phi'
+    | '/mua-hang'
+    | '/nha-cung-cap'
+    | '/san-pham'
+    | '/van-chuyen'
+  id:
+    | '__root__'
+    | '/'
+    | '/ban-hang'
+    | '/chi-phi'
+    | '/don-vi-vc'
+    | '/khach-hang'
+    | '/loai-chi-phi'
+    | '/mua-hang'
+    | '/nha-cung-cap'
+    | '/san-pham'
+    | '/van-chuyen'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BanHangRoute: typeof BanHangRoute
+  ChiPhiRoute: typeof ChiPhiRoute
+  DonViVcRoute: typeof DonViVcRoute
+  KhachHangRoute: typeof KhachHangRoute
+  LoaiChiPhiRoute: typeof LoaiChiPhiRoute
+  MuaHangRoute: typeof MuaHangRoute
+  NhaCungCapRoute: typeof NhaCungCapRoute
+  SanPhamRoute: typeof SanPhamRoute
+  VanChuyenRoute: typeof VanChuyenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/van-chuyen': {
+      id: '/van-chuyen'
+      path: '/van-chuyen'
+      fullPath: '/van-chuyen'
+      preLoaderRoute: typeof VanChuyenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/san-pham': {
+      id: '/san-pham'
+      path: '/san-pham'
+      fullPath: '/san-pham'
+      preLoaderRoute: typeof SanPhamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nha-cung-cap': {
+      id: '/nha-cung-cap'
+      path: '/nha-cung-cap'
+      fullPath: '/nha-cung-cap'
+      preLoaderRoute: typeof NhaCungCapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mua-hang': {
+      id: '/mua-hang'
+      path: '/mua-hang'
+      fullPath: '/mua-hang'
+      preLoaderRoute: typeof MuaHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loai-chi-phi': {
+      id: '/loai-chi-phi'
+      path: '/loai-chi-phi'
+      fullPath: '/loai-chi-phi'
+      preLoaderRoute: typeof LoaiChiPhiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/khach-hang': {
+      id: '/khach-hang'
+      path: '/khach-hang'
+      fullPath: '/khach-hang'
+      preLoaderRoute: typeof KhachHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/don-vi-vc': {
+      id: '/don-vi-vc'
+      path: '/don-vi-vc'
+      fullPath: '/don-vi-vc'
+      preLoaderRoute: typeof DonViVcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chi-phi': {
+      id: '/chi-phi'
+      path: '/chi-phi'
+      fullPath: '/chi-phi'
+      preLoaderRoute: typeof ChiPhiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ban-hang': {
+      id: '/ban-hang'
+      path: '/ban-hang'
+      fullPath: '/ban-hang'
+      preLoaderRoute: typeof BanHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +237,26 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BanHangRoute: BanHangRoute,
+  ChiPhiRoute: ChiPhiRoute,
+  DonViVcRoute: DonViVcRoute,
+  KhachHangRoute: KhachHangRoute,
+  LoaiChiPhiRoute: LoaiChiPhiRoute,
+  MuaHangRoute: MuaHangRoute,
+  NhaCungCapRoute: NhaCungCapRoute,
+  SanPhamRoute: SanPhamRoute,
+  VanChuyenRoute: VanChuyenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
