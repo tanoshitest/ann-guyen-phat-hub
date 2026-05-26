@@ -11,12 +11,24 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VanChuyenRouteImport } from './routes/van-chuyen'
 import { Route as SanPhamRouteImport } from './routes/san-pham'
+import { Route as NhatKyRouteImport } from './routes/nhat-ky'
 import { Route as NhaCungCapRouteImport } from './routes/nha-cung-cap'
 import { Route as MuaHangRouteImport } from './routes/mua-hang'
 import { Route as LoaiChiPhiRouteImport } from './routes/loai-chi-phi'
+import { Route as KhoHoaDonRouteImport } from './routes/kho-hoa-don'
 import { Route as KhachHangRouteImport } from './routes/khach-hang'
+import { Route as HdDauVaoRouteImport } from './routes/hd-dau-vao'
+import { Route as HdDauRaRouteImport } from './routes/hd-dau-ra'
 import { Route as DonViVcRouteImport } from './routes/don-vi-vc'
+import { Route as CongNoVcRouteImport } from './routes/cong-no-vc'
+import { Route as CongNoNccRouteImport } from './routes/cong-no-ncc'
+import { Route as CongNoKhRouteImport } from './routes/cong-no-kh'
 import { Route as ChiPhiRouteImport } from './routes/chi-phi'
+import { Route as CaiDatRouteImport } from './routes/cai-dat'
+import { Route as BcLoiNhuanRouteImport } from './routes/bc-loi-nhuan'
+import { Route as BcDoanhThuRouteImport } from './routes/bc-doanh-thu'
+import { Route as BcCongNoRouteImport } from './routes/bc-cong-no'
+import { Route as BcChiPhiRouteImport } from './routes/bc-chi-phi'
 import { Route as BanHangRouteImport } from './routes/ban-hang'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -28,6 +40,11 @@ const VanChuyenRoute = VanChuyenRouteImport.update({
 const SanPhamRoute = SanPhamRouteImport.update({
   id: '/san-pham',
   path: '/san-pham',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NhatKyRoute = NhatKyRouteImport.update({
+  id: '/nhat-ky',
+  path: '/nhat-ky',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NhaCungCapRoute = NhaCungCapRouteImport.update({
@@ -45,9 +62,24 @@ const LoaiChiPhiRoute = LoaiChiPhiRouteImport.update({
   path: '/loai-chi-phi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KhoHoaDonRoute = KhoHoaDonRouteImport.update({
+  id: '/kho-hoa-don',
+  path: '/kho-hoa-don',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KhachHangRoute = KhachHangRouteImport.update({
   id: '/khach-hang',
   path: '/khach-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HdDauVaoRoute = HdDauVaoRouteImport.update({
+  id: '/hd-dau-vao',
+  path: '/hd-dau-vao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HdDauRaRoute = HdDauRaRouteImport.update({
+  id: '/hd-dau-ra',
+  path: '/hd-dau-ra',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DonViVcRoute = DonViVcRouteImport.update({
@@ -55,9 +87,49 @@ const DonViVcRoute = DonViVcRouteImport.update({
   path: '/don-vi-vc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CongNoVcRoute = CongNoVcRouteImport.update({
+  id: '/cong-no-vc',
+  path: '/cong-no-vc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CongNoNccRoute = CongNoNccRouteImport.update({
+  id: '/cong-no-ncc',
+  path: '/cong-no-ncc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CongNoKhRoute = CongNoKhRouteImport.update({
+  id: '/cong-no-kh',
+  path: '/cong-no-kh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChiPhiRoute = ChiPhiRouteImport.update({
   id: '/chi-phi',
   path: '/chi-phi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaiDatRoute = CaiDatRouteImport.update({
+  id: '/cai-dat',
+  path: '/cai-dat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BcLoiNhuanRoute = BcLoiNhuanRouteImport.update({
+  id: '/bc-loi-nhuan',
+  path: '/bc-loi-nhuan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BcDoanhThuRoute = BcDoanhThuRouteImport.update({
+  id: '/bc-doanh-thu',
+  path: '/bc-doanh-thu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BcCongNoRoute = BcCongNoRouteImport.update({
+  id: '/bc-cong-no',
+  path: '/bc-cong-no',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BcChiPhiRoute = BcChiPhiRouteImport.update({
+  id: '/bc-chi-phi',
+  path: '/bc-chi-phi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BanHangRoute = BanHangRouteImport.update({
@@ -74,24 +146,48 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ban-hang': typeof BanHangRoute
+  '/bc-chi-phi': typeof BcChiPhiRoute
+  '/bc-cong-no': typeof BcCongNoRoute
+  '/bc-doanh-thu': typeof BcDoanhThuRoute
+  '/bc-loi-nhuan': typeof BcLoiNhuanRoute
+  '/cai-dat': typeof CaiDatRoute
   '/chi-phi': typeof ChiPhiRoute
+  '/cong-no-kh': typeof CongNoKhRoute
+  '/cong-no-ncc': typeof CongNoNccRoute
+  '/cong-no-vc': typeof CongNoVcRoute
   '/don-vi-vc': typeof DonViVcRoute
+  '/hd-dau-ra': typeof HdDauRaRoute
+  '/hd-dau-vao': typeof HdDauVaoRoute
   '/khach-hang': typeof KhachHangRoute
+  '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
+  '/nhat-ky': typeof NhatKyRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ban-hang': typeof BanHangRoute
+  '/bc-chi-phi': typeof BcChiPhiRoute
+  '/bc-cong-no': typeof BcCongNoRoute
+  '/bc-doanh-thu': typeof BcDoanhThuRoute
+  '/bc-loi-nhuan': typeof BcLoiNhuanRoute
+  '/cai-dat': typeof CaiDatRoute
   '/chi-phi': typeof ChiPhiRoute
+  '/cong-no-kh': typeof CongNoKhRoute
+  '/cong-no-ncc': typeof CongNoNccRoute
+  '/cong-no-vc': typeof CongNoVcRoute
   '/don-vi-vc': typeof DonViVcRoute
+  '/hd-dau-ra': typeof HdDauRaRoute
+  '/hd-dau-vao': typeof HdDauVaoRoute
   '/khach-hang': typeof KhachHangRoute
+  '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
+  '/nhat-ky': typeof NhatKyRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
 }
@@ -99,12 +195,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ban-hang': typeof BanHangRoute
+  '/bc-chi-phi': typeof BcChiPhiRoute
+  '/bc-cong-no': typeof BcCongNoRoute
+  '/bc-doanh-thu': typeof BcDoanhThuRoute
+  '/bc-loi-nhuan': typeof BcLoiNhuanRoute
+  '/cai-dat': typeof CaiDatRoute
   '/chi-phi': typeof ChiPhiRoute
+  '/cong-no-kh': typeof CongNoKhRoute
+  '/cong-no-ncc': typeof CongNoNccRoute
+  '/cong-no-vc': typeof CongNoVcRoute
   '/don-vi-vc': typeof DonViVcRoute
+  '/hd-dau-ra': typeof HdDauRaRoute
+  '/hd-dau-vao': typeof HdDauVaoRoute
   '/khach-hang': typeof KhachHangRoute
+  '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
+  '/nhat-ky': typeof NhatKyRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
 }
@@ -113,36 +221,72 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ban-hang'
+    | '/bc-chi-phi'
+    | '/bc-cong-no'
+    | '/bc-doanh-thu'
+    | '/bc-loi-nhuan'
+    | '/cai-dat'
     | '/chi-phi'
+    | '/cong-no-kh'
+    | '/cong-no-ncc'
+    | '/cong-no-vc'
     | '/don-vi-vc'
+    | '/hd-dau-ra'
+    | '/hd-dau-vao'
     | '/khach-hang'
+    | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
     | '/nha-cung-cap'
+    | '/nhat-ky'
     | '/san-pham'
     | '/van-chuyen'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/ban-hang'
+    | '/bc-chi-phi'
+    | '/bc-cong-no'
+    | '/bc-doanh-thu'
+    | '/bc-loi-nhuan'
+    | '/cai-dat'
     | '/chi-phi'
+    | '/cong-no-kh'
+    | '/cong-no-ncc'
+    | '/cong-no-vc'
     | '/don-vi-vc'
+    | '/hd-dau-ra'
+    | '/hd-dau-vao'
     | '/khach-hang'
+    | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
     | '/nha-cung-cap'
+    | '/nhat-ky'
     | '/san-pham'
     | '/van-chuyen'
   id:
     | '__root__'
     | '/'
     | '/ban-hang'
+    | '/bc-chi-phi'
+    | '/bc-cong-no'
+    | '/bc-doanh-thu'
+    | '/bc-loi-nhuan'
+    | '/cai-dat'
     | '/chi-phi'
+    | '/cong-no-kh'
+    | '/cong-no-ncc'
+    | '/cong-no-vc'
     | '/don-vi-vc'
+    | '/hd-dau-ra'
+    | '/hd-dau-vao'
     | '/khach-hang'
+    | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
     | '/nha-cung-cap'
+    | '/nhat-ky'
     | '/san-pham'
     | '/van-chuyen'
   fileRoutesById: FileRoutesById
@@ -150,12 +294,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BanHangRoute: typeof BanHangRoute
+  BcChiPhiRoute: typeof BcChiPhiRoute
+  BcCongNoRoute: typeof BcCongNoRoute
+  BcDoanhThuRoute: typeof BcDoanhThuRoute
+  BcLoiNhuanRoute: typeof BcLoiNhuanRoute
+  CaiDatRoute: typeof CaiDatRoute
   ChiPhiRoute: typeof ChiPhiRoute
+  CongNoKhRoute: typeof CongNoKhRoute
+  CongNoNccRoute: typeof CongNoNccRoute
+  CongNoVcRoute: typeof CongNoVcRoute
   DonViVcRoute: typeof DonViVcRoute
+  HdDauRaRoute: typeof HdDauRaRoute
+  HdDauVaoRoute: typeof HdDauVaoRoute
   KhachHangRoute: typeof KhachHangRoute
+  KhoHoaDonRoute: typeof KhoHoaDonRoute
   LoaiChiPhiRoute: typeof LoaiChiPhiRoute
   MuaHangRoute: typeof MuaHangRoute
   NhaCungCapRoute: typeof NhaCungCapRoute
+  NhatKyRoute: typeof NhatKyRoute
   SanPhamRoute: typeof SanPhamRoute
   VanChuyenRoute: typeof VanChuyenRoute
 }
@@ -174,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/san-pham'
       fullPath: '/san-pham'
       preLoaderRoute: typeof SanPhamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nhat-ky': {
+      id: '/nhat-ky'
+      path: '/nhat-ky'
+      fullPath: '/nhat-ky'
+      preLoaderRoute: typeof NhatKyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nha-cung-cap': {
@@ -197,11 +360,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoaiChiPhiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kho-hoa-don': {
+      id: '/kho-hoa-don'
+      path: '/kho-hoa-don'
+      fullPath: '/kho-hoa-don'
+      preLoaderRoute: typeof KhoHoaDonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/khach-hang': {
       id: '/khach-hang'
       path: '/khach-hang'
       fullPath: '/khach-hang'
       preLoaderRoute: typeof KhachHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hd-dau-vao': {
+      id: '/hd-dau-vao'
+      path: '/hd-dau-vao'
+      fullPath: '/hd-dau-vao'
+      preLoaderRoute: typeof HdDauVaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hd-dau-ra': {
+      id: '/hd-dau-ra'
+      path: '/hd-dau-ra'
+      fullPath: '/hd-dau-ra'
+      preLoaderRoute: typeof HdDauRaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/don-vi-vc': {
@@ -211,11 +395,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DonViVcRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cong-no-vc': {
+      id: '/cong-no-vc'
+      path: '/cong-no-vc'
+      fullPath: '/cong-no-vc'
+      preLoaderRoute: typeof CongNoVcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cong-no-ncc': {
+      id: '/cong-no-ncc'
+      path: '/cong-no-ncc'
+      fullPath: '/cong-no-ncc'
+      preLoaderRoute: typeof CongNoNccRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cong-no-kh': {
+      id: '/cong-no-kh'
+      path: '/cong-no-kh'
+      fullPath: '/cong-no-kh'
+      preLoaderRoute: typeof CongNoKhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chi-phi': {
       id: '/chi-phi'
       path: '/chi-phi'
       fullPath: '/chi-phi'
       preLoaderRoute: typeof ChiPhiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cai-dat': {
+      id: '/cai-dat'
+      path: '/cai-dat'
+      fullPath: '/cai-dat'
+      preLoaderRoute: typeof CaiDatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bc-loi-nhuan': {
+      id: '/bc-loi-nhuan'
+      path: '/bc-loi-nhuan'
+      fullPath: '/bc-loi-nhuan'
+      preLoaderRoute: typeof BcLoiNhuanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bc-doanh-thu': {
+      id: '/bc-doanh-thu'
+      path: '/bc-doanh-thu'
+      fullPath: '/bc-doanh-thu'
+      preLoaderRoute: typeof BcDoanhThuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bc-cong-no': {
+      id: '/bc-cong-no'
+      path: '/bc-cong-no'
+      fullPath: '/bc-cong-no'
+      preLoaderRoute: typeof BcCongNoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bc-chi-phi': {
+      id: '/bc-chi-phi'
+      path: '/bc-chi-phi'
+      fullPath: '/bc-chi-phi'
+      preLoaderRoute: typeof BcChiPhiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ban-hang': {
@@ -238,12 +478,24 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BanHangRoute: BanHangRoute,
+  BcChiPhiRoute: BcChiPhiRoute,
+  BcCongNoRoute: BcCongNoRoute,
+  BcDoanhThuRoute: BcDoanhThuRoute,
+  BcLoiNhuanRoute: BcLoiNhuanRoute,
+  CaiDatRoute: CaiDatRoute,
   ChiPhiRoute: ChiPhiRoute,
+  CongNoKhRoute: CongNoKhRoute,
+  CongNoNccRoute: CongNoNccRoute,
+  CongNoVcRoute: CongNoVcRoute,
   DonViVcRoute: DonViVcRoute,
+  HdDauRaRoute: HdDauRaRoute,
+  HdDauVaoRoute: HdDauVaoRoute,
   KhachHangRoute: KhachHangRoute,
+  KhoHoaDonRoute: KhoHoaDonRoute,
   LoaiChiPhiRoute: LoaiChiPhiRoute,
   MuaHangRoute: MuaHangRoute,
   NhaCungCapRoute: NhaCungCapRoute,
+  NhatKyRoute: NhatKyRoute,
   SanPhamRoute: SanPhamRoute,
   VanChuyenRoute: VanChuyenRoute,
 }
