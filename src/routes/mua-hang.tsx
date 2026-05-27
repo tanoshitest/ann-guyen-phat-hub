@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, purchases, suppliers, fmtVND, fmtDate } from "@/lib/mock-data";
+import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
 
 export const Route = createFileRoute("/mua-hang")({ component: Page });
 
@@ -12,6 +13,12 @@ function Page() {
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
 
+  useEffect(() => {
+    listDemoRecords<(typeof purchases)[number]>("purchases")
+      .then((demoRows) => setRows(mergeDemoRows(purchases, demoRows, (row) => row.MA_CHUNG_TU)))
+      .catch(console.error);
+  }, []);
+
   return (
     <DataTable
       title="Mua hàng"
@@ -20,16 +27,18 @@ function Page() {
       onAdd={(record) => {
         setRows((prev) => {
           const giaTriMua = record.giaTriMua || record.soLuong * record.donGia;
+          const next = {
+            ...record,
+            MA_CHUNG_TU: record.MA_CHUNG_TU || `MUADEMO${String(prev.length + 1).padStart(4, "0")}`,
+            ngay: record.ngay || today,
+            giaTriMua,
+            ngayHD: record.ngayHD || record.ngay || today,
+            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+          };
+          void saveDemoRecord("purchases", next.MA_CHUNG_TU, next).catch(console.error);
           return [
-            {
-              ...record,
-              MA_CHUNG_TU: record.MA_CHUNG_TU || `MUADEMO${String(prev.length + 1).padStart(4, "0")}`,
-              ngay: record.ngay || today,
-              giaTriMua,
-              ngayHD: record.ngayHD || record.ngay || today,
-              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-            },
-            ...prev,
+            next,
+            ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU),
           ];
         });
       }}

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable } from "@/components/DataTable";
 import { customers, purchases, sales, shippers, shippings, suppliers, fmtVND } from "@/lib/mock-data";
-import { useState } from "react";
+import { listDemoRecords, saveDemoRecord } from "@/lib/supabase-demo";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/cong-no")({ component: Page });
 
@@ -19,6 +20,7 @@ type DebtRow = {
   quaHan: number;
   trangThai: DebtStatus;
 };
+type DebtStatusRecord = { key: string; status: DebtStatus };
 
 function KindTag({ kind }: { kind: DebtKind }) {
   const cls =
@@ -43,6 +45,15 @@ function debtKey(row: DebtRow) {
 
 function Page() {
   const [statusByDebt, setStatusByDebt] = useState<Record<string, DebtStatus>>({});
+
+  useEffect(() => {
+    listDemoRecords<DebtStatusRecord>("debt_statuses")
+      .then((records) => {
+        setStatusByDebt(Object.fromEntries(records.map((record) => [record.key, record.status])));
+      })
+      .catch(console.error);
+  }, []);
+
   const customerRows = customers.map((c) => {
     const related = sales.filter((s) => s.MA_THONG_KE === c.MA_THONG_KE);
     const tongPhatSinh = related.reduce((sum, s) => sum + s.tongTT, 0);
@@ -139,12 +150,15 @@ function Page() {
           render: (r) => (
             <select
               value={r.trangThai}
-              onChange={(e) =>
+              onChange={(e) => {
+                const key = debtKey(r);
+                const status = e.target.value as DebtStatus;
                 setStatusByDebt((current) => ({
                   ...current,
-                  [debtKey(r)]: e.target.value as DebtStatus,
-                }))
-              }
+                  [key]: status,
+                }));
+                void saveDemoRecord("debt_statuses", key, { key, status }).catch(console.error);
+              }}
               className="h-7 w-full rounded border bg-background px-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-ring"
             >
               {debtStatuses.map((status) => (

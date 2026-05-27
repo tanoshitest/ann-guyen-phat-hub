@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, shippers, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
+import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
 
 export const Route = createFileRoute("/van-chuyen")({ component: Page });
 
@@ -13,6 +14,12 @@ function Page() {
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
 
+  useEffect(() => {
+    listDemoRecords<(typeof shippings)[number]>("shippings")
+      .then((demoRows) => setRows(mergeDemoRows(shippings, demoRows, (row) => row.MA_CHUNG_TU)))
+      .catch(console.error);
+  }, []);
+
   return (
     <DataTable
       title="Vận chuyển"
@@ -21,16 +28,18 @@ function Page() {
       onAdd={(record) => {
         setRows((prev) => {
           const giaTriVC = record.giaTriVC || record.soLuong * record.donGia;
+          const next = {
+            ...record,
+            MA_CHUNG_TU: record.MA_CHUNG_TU || `VCDEMO${String(prev.length + 1).padStart(4, "0")}`,
+            ngay: record.ngay || today,
+            giaTriVC,
+            ngayHD: record.ngayHD || record.ngay || today,
+            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+          };
+          void saveDemoRecord("shippings", next.MA_CHUNG_TU, next).catch(console.error);
           return [
-            {
-              ...record,
-              MA_CHUNG_TU: record.MA_CHUNG_TU || `VCDEMO${String(prev.length + 1).padStart(4, "0")}`,
-              ngay: record.ngay || today,
-              giaTriVC,
-              ngayHD: record.ngayHD || record.ngay || today,
-              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-            },
-            ...prev,
+            next,
+            ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU),
           ];
         });
       }}

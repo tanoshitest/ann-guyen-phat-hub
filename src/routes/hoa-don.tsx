@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable } from "@/components/DataTable";
 import { sales, purchases, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
+import { listDemoRecords, saveDemoRecord } from "@/lib/supabase-demo";
 import { FileText } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/hoa-don")({ component: Page });
 
@@ -17,6 +18,7 @@ type InvoiceRow = {
   giaTri: number;
   trangThai: string;
 };
+type InvoiceStatusRecord = { key: string; status: string };
 
 const invoiceStatuses = ["Đã nhận", "Chưa nhận", "Đã thanh toán", "Còn nợ", "Quá hạn", "Đã hủy"];
 
@@ -45,6 +47,15 @@ function FileLink({ ext }: { ext: string }) {
 
 function Page() {
   const [statusByInvoice, setStatusByInvoice] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    listDemoRecords<InvoiceStatusRecord>("invoice_statuses")
+      .then((records) => {
+        setStatusByInvoice(Object.fromEntries(records.map((record) => [record.key, record.status])));
+      })
+      .catch(console.error);
+  }, []);
+
   const baseRows: InvoiceRow[] = useMemo(
     () =>
       [
@@ -105,12 +116,15 @@ function Page() {
           render: (r) => (
             <select
               value={r.trangThai}
-              onChange={(e) =>
+              onChange={(e) => {
+                const key = invoiceKey(r);
+                const status = e.target.value;
                 setStatusByInvoice((current) => ({
                   ...current,
-                  [invoiceKey(r)]: e.target.value,
-                }))
-              }
+                  [key]: status,
+                }));
+                void saveDemoRecord("invoice_statuses", key, { key, status }).catch(console.error);
+              }}
               className="h-7 w-full rounded border bg-background px-2 text-[12px] focus:outline-none focus:ring-1 focus:ring-ring"
             >
               {invoiceStatuses.map((status) => (

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
+import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
 import {
   customers,
   expenses,
@@ -31,20 +32,27 @@ function Page() {
   ];
   const today = new Date().toISOString().slice(0, 10);
 
+  useEffect(() => {
+    listDemoRecords<(typeof expenses)[number]>("expenses")
+      .then((demoRows) => setRows(mergeDemoRows(expenses, demoRows, (row) => row.MA_CHI_PHI)))
+      .catch(console.error);
+  }, []);
+
   return (
     <DataTable
       title="Chi phí"
       data={rows}
       searchKeys={["MA_CHI_PHI", "loaiCP", "doiTuong", "MA_CHUNG_TU", "lyDo"]}
       onAdd={(record) => {
-        setRows((prev) => [
-          {
+        setRows((prev) => {
+          const next = {
             ...record,
             MA_CHI_PHI: record.MA_CHI_PHI || `CPDEMO${String(prev.length + 1).padStart(4, "0")}`,
             ngay: record.ngay || today,
-          },
-          ...prev,
-        ]);
+          };
+          void saveDemoRecord("expenses", next.MA_CHI_PHI, next).catch(console.error);
+          return [next, ...prev.filter((row) => row.MA_CHI_PHI !== next.MA_CHI_PHI)];
+        });
       }}
       columns={[
         { key: "MA_CHI_PHI", label: "MA_CHI_PHI", width: 110 },

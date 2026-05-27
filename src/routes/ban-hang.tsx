@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, sales, fmtVND, fmtDate } from "@/lib/mock-data";
+import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/ban-hang")({ component: Page });
@@ -23,6 +24,12 @@ function Page() {
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
 
+  useEffect(() => {
+    listDemoRecords<(typeof sales)[number]>("sales")
+      .then((demoRows) => setRows(mergeDemoRows(sales, demoRows, (row) => row.MA_CHUNG_TU)))
+      .catch(console.error);
+  }, []);
+
   return (
     <DataTable
       title="Bán hàng"
@@ -33,19 +40,21 @@ function Page() {
           const giaTriBan = record.giaTriBan || record.soLuong * record.donGia;
           const tienVat = record.tienVat || Math.round((giaTriBan * record.vat) / 100);
           const tongTT = record.tongTT || giaTriBan + tienVat + record.congJumbo - record.truJumbo;
+          const next = {
+            ...record,
+            MA_CHUNG_TU: record.MA_CHUNG_TU || `BANDEMO${String(prev.length + 1).padStart(4, "0")}`,
+            ngay: record.ngay || today,
+            giaTriBan,
+            tienVat,
+            tongTT,
+            ngayHD: record.ngayHD || record.ngay || today,
+            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+            trangThai: record.trangThai || prev[0]?.trangThai,
+          };
+          void saveDemoRecord("sales", next.MA_CHUNG_TU, next).catch(console.error);
           return [
-            {
-              ...record,
-              MA_CHUNG_TU: record.MA_CHUNG_TU || `BANDEMO${String(prev.length + 1).padStart(4, "0")}`,
-              ngay: record.ngay || today,
-              giaTriBan,
-              tienVat,
-              tongTT,
-              ngayHD: record.ngayHD || record.ngay || today,
-              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-              trangThai: record.trangThai || prev[0]?.trangThai,
-            },
-            ...prev,
+            next,
+            ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU),
           ];
         });
       }}
