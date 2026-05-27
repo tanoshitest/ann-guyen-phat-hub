@@ -408,8 +408,9 @@ export const expenses: Expense[] = (() => {
   return arr;
 })();
 
-export function fmtVND(n: number) {
-  return n.toLocaleString("vi-VN");
+export function fmtVND(n?: number | string | null) {
+  const value = typeof n === "number" ? n : Number(n ?? 0);
+  return (Number.isFinite(value) ? value : 0).toLocaleString("vi-VN");
 }
 
 export function fmtDate(s: string) {

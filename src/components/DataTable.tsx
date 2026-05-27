@@ -11,6 +11,12 @@ export type Column<T> = {
   accessor?: (row: T) => string | number;
 };
 
+function parseFormNumber(value: string) {
+  const normalized = value.trim().replace(/\./g, "").replace(",", ".");
+  const parsed = Number(normalized || 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 type Props<T> = {
   title: string;
   data: T[];
@@ -230,7 +236,7 @@ function AddRecordDialog<T extends Record<string, any>>({
             if (key === "actions") return acc;
             const rawValue = formData.get(key);
             const value = typeof rawValue === "string" ? rawValue : "";
-            acc[key] = column.numeric ? Number(value || 0) : value;
+            acc[key] = column.numeric ? parseFormNumber(value) : value;
             return acc;
           }, {});
           onSave(record as T);
