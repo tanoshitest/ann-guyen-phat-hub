@@ -228,6 +228,7 @@ function AddRecordDialog<T extends Record<string, any>>({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
       <form
         className="w-full max-w-4xl max-h-[88vh] overflow-hidden rounded-md border bg-card shadow-lg"
+        autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
@@ -369,6 +370,7 @@ function FormField<T extends Record<string, any>>({ column }: { column: Column<T
         <select
           name={key}
           defaultValue=""
+          autoComplete={`new-${key}`}
           className="h-8 w-full rounded border bg-background px-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="" disabled>
@@ -384,12 +386,17 @@ function FormField<T extends Record<string, any>>({ column }: { column: Column<T
         <textarea
           name={key}
           rows={3}
+          autoComplete={`new-${key}`}
+          spellCheck={false}
           className="w-full rounded border bg-background px-2 py-1.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
         />
       ) : (
         <input
           name={key}
           type={isDate ? "date" : column.numeric ? "number" : "text"}
+          autoComplete={`new-${key}`}
+          autoCorrect="off"
+          spellCheck={false}
           className="h-8 w-full rounded border bg-background px-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
         />
       )}
