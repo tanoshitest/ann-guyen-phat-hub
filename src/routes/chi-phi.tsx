@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
-import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import {
+  deleteDemoRecord,
+  listDeletedDemoKeys,
+  listDemoRecords,
+  listMergedDemoRows,
+  mergeDemoRows,
+  saveDemoRecord,
+  uniqueOptions,
+} from "@/lib/supabase-demo";
 import { Trash2 } from "lucide-react";
 import {
   customers,
@@ -20,11 +28,15 @@ export const Route = createFileRoute("/chi-phi")({ component: Page });
 
 function Page() {
   const [rows, setRows] = useState(expenses);
-  const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
+  const [customerRows, setCustomerRows] = useState(customers);
+  const [supplierRows, setSupplierRows] = useState(suppliers);
+  const [shipperRows, setShipperRows] = useState(shippers);
+  const [expenseTypeRows, setExpenseTypeRows] = useState(expenseTypes);
+  const statisticOptions = uniqueOptions(customerRows.map((customer) => customer.MA_THONG_KE));
   const objectOptions = [
-    ...customers.map((customer) => customer.ten),
-    ...suppliers.map((supplier) => supplier.ten),
-    ...shippers.map((shipper) => shipper.ten),
+    ...customerRows.map((customer) => customer.ten),
+    ...supplierRows.map((supplier) => supplier.ten),
+    ...shipperRows.map((shipper) => shipper.ten),
   ];
   const documentOptions = [
     ...sales.map((sale) => sale.MA_CHUNG_TU),
@@ -32,6 +44,44 @@ function Page() {
     ...shippings.map((shipping) => shipping.MA_CHUNG_TU),
   ];
   const today = new Date().toISOString().slice(0, 10);
+  const customerWithDefaults = (record: (typeof customers)[number], index: number) => ({
+    ...record,
+    MA_KH: record.MA_KH || `KH_DEMO${String(index + 1).padStart(3, "0")}`,
+    MA_THONG_KE: record.MA_THONG_KE || `TK_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Khach hang demo",
+    mst: record.mst || "",
+    diaChi: record.diaChi || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    email: record.email || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const supplierWithDefaults = (record: (typeof suppliers)[number], index: number) => ({
+    ...record,
+    MA_NCC: record.MA_NCC || `NCC_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Nha cung cap demo",
+    mst: record.mst || "",
+    diaChi: record.diaChi || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    email: record.email || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const shipperWithDefaults = (record: (typeof shippers)[number], index: number) => ({
+    ...record,
+    MA_VC: record.MA_VC || `VC_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Don vi van chuyen demo",
+    mst: record.mst || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    bienSo: record.bienSo || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const expenseTypeWithDefaults = (record: (typeof expenseTypes)[number], index: number) => ({
+    ...record,
+    MA_LOAI_CP: record.MA_LOAI_CP || `CP_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Loai chi phi demo",
+  });
   const withDefaults = (record: (typeof expenses)[number], index: number) => ({
     ...record,
     MA_CHI_PHI: record.MA_CHI_PHI || `CPDEMO${String(index + 1).padStart(4, "0")}`,
@@ -47,6 +97,22 @@ function Page() {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
         setRows(mergeDemoRows(expenses, safeRows, (row) => row.MA_CHI_PHI).filter((row) => !deleted.has(row.MA_CHI_PHI)));
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      listMergedDemoRows("customers", customers, (row) => row.MA_KH, customerWithDefaults),
+      listMergedDemoRows("suppliers", suppliers, (row) => row.MA_NCC, supplierWithDefaults),
+      listMergedDemoRows("shippers", shippers, (row) => row.MA_VC, shipperWithDefaults),
+      listMergedDemoRows("expense_types", expenseTypes, (row) => row.MA_LOAI_CP, expenseTypeWithDefaults),
+    ])
+      .then(([nextCustomers, nextSuppliers, nextShippers, nextExpenseTypes]) => {
+        setCustomerRows(nextCustomers);
+        setSupplierRows(nextSuppliers);
+        setShipperRows(nextShippers);
+        setExpenseTypeRows(nextExpenseTypes);
       })
       .catch(console.error);
   }, []);
@@ -72,7 +138,7 @@ function Page() {
       columns={[
         { key: "MA_CHI_PHI", label: "MA_CHI_PHI", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },
-        { key: "loaiCP", label: "Loại chi phí", width: 170, options: expenseTypes.map((type) => type.ten) },
+        { key: "loaiCP", label: "Loại chi phí", width: 170, options: uniqueOptions(expenseTypeRows.map((type) => type.ten)) },
         { key: "doiTuong", label: "Đối tượng", width: 200, options: objectOptions },
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110, options: documentOptions },
         { key: "MA_THONG_KE", label: "MA_THONG_KE", width: 110, options: statisticOptions },

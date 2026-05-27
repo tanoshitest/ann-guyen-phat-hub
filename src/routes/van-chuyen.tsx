@@ -2,18 +2,58 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, shippers, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
-import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import {
+  deleteDemoRecord,
+  listDeletedDemoKeys,
+  listDemoRecords,
+  listMergedDemoRows,
+  mergeDemoRows,
+  saveDemoRecord,
+  uniqueOptions,
+} from "@/lib/supabase-demo";
 import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/van-chuyen")({ component: Page });
 
 function Page() {
   const [rows, setRows] = useState(shippings);
-  const shipperOptions = shippers.map((shipper) => shipper.ten);
-  const plateOptions = shippers.map((shipper) => shipper.bienSo);
-  const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
-  const productOptions = products.map((product) => product.MA_SP);
+  const [customerRows, setCustomerRows] = useState(customers);
+  const [shipperRows, setShipperRows] = useState(shippers);
+  const [productRows, setProductRows] = useState(products);
+  const shipperOptions = uniqueOptions(shipperRows.map((shipper) => shipper.ten));
+  const plateOptions = uniqueOptions(shipperRows.map((shipper) => shipper.bienSo));
+  const statisticOptions = uniqueOptions(customerRows.map((customer) => customer.MA_THONG_KE));
+  const productOptions = uniqueOptions(productRows.map((product) => product.MA_SP));
   const today = new Date().toISOString().slice(0, 10);
+  const customerWithDefaults = (record: (typeof customers)[number], index: number) => ({
+    ...record,
+    MA_KH: record.MA_KH || `KH_DEMO${String(index + 1).padStart(3, "0")}`,
+    MA_THONG_KE: record.MA_THONG_KE || `TK_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Khach hang demo",
+    mst: record.mst || "",
+    diaChi: record.diaChi || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    email: record.email || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const shipperWithDefaults = (record: (typeof shippers)[number], index: number) => ({
+    ...record,
+    MA_VC: record.MA_VC || `VC_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Don vi van chuyen demo",
+    mst: record.mst || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    bienSo: record.bienSo || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const productWithDefaults = (record: (typeof products)[number], index: number) => ({
+    ...record,
+    MA_SP: record.MA_SP || `SP_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "San pham demo",
+    dvt: record.dvt || "kg",
+    vat: record.vat || 0,
+  });
   const withDefaults = (record: (typeof shippings)[number], index: number) => {
     const soLuong = record.soLuong || 0;
     const donGia = record.donGia || 0;
@@ -37,6 +77,20 @@ function Page() {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
         setRows(mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      listMergedDemoRows("customers", customers, (row) => row.MA_KH, customerWithDefaults),
+      listMergedDemoRows("shippers", shippers, (row) => row.MA_VC, shipperWithDefaults),
+      listMergedDemoRows("products", products, (row) => row.MA_SP, productWithDefaults),
+    ])
+      .then(([nextCustomers, nextShippers, nextProducts]) => {
+        setCustomerRows(nextCustomers);
+        setShipperRows(nextShippers);
+        setProductRows(nextProducts);
       })
       .catch(console.error);
   }, []);

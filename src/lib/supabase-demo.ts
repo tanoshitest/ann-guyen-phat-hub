@@ -99,3 +99,22 @@ export function mergeDemoRows<T>(baseRows: T[], demoRows: T[], keyOf: (row: T) =
   const seen = new Set(demoRows.map(keyOf));
   return [...demoRows, ...baseRows.filter((row) => !seen.has(keyOf(row)))];
 }
+
+export async function listMergedDemoRows<T>(
+  tableName: string,
+  baseRows: T[],
+  keyOf: (row: T) => string,
+  withDefaults: (row: T, index: number) => T,
+) {
+  const [demoRows, deletedKeys] = await Promise.all([
+    listDemoRecords<T>(tableName),
+    listDeletedDemoKeys(tableName),
+  ]);
+  const safeRows = demoRows.map((record, index) => withDefaults(record, index));
+  const deleted = new Set(deletedKeys);
+  return mergeDemoRows(baseRows, safeRows, keyOf).filter((row) => !deleted.has(keyOf(row)));
+}
+
+export function uniqueOptions(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)));
+}

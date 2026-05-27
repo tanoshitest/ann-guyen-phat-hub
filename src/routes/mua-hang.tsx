@@ -2,17 +2,58 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, purchases, suppliers, fmtVND, fmtDate } from "@/lib/mock-data";
-import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import {
+  deleteDemoRecord,
+  listDeletedDemoKeys,
+  listDemoRecords,
+  listMergedDemoRows,
+  mergeDemoRows,
+  saveDemoRecord,
+  uniqueOptions,
+} from "@/lib/supabase-demo";
 import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/mua-hang")({ component: Page });
 
 function Page() {
   const [rows, setRows] = useState(purchases);
-  const supplierOptions = suppliers.map((supplier) => supplier.ten);
-  const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
-  const productOptions = products.map((product) => product.MA_SP);
+  const [customerRows, setCustomerRows] = useState(customers);
+  const [supplierRows, setSupplierRows] = useState(suppliers);
+  const [productRows, setProductRows] = useState(products);
+  const supplierOptions = uniqueOptions(supplierRows.map((supplier) => supplier.ten));
+  const statisticOptions = uniqueOptions(customerRows.map((customer) => customer.MA_THONG_KE));
+  const productOptions = uniqueOptions(productRows.map((product) => product.MA_SP));
   const today = new Date().toISOString().slice(0, 10);
+  const customerWithDefaults = (record: (typeof customers)[number], index: number) => ({
+    ...record,
+    MA_KH: record.MA_KH || `KH_DEMO${String(index + 1).padStart(3, "0")}`,
+    MA_THONG_KE: record.MA_THONG_KE || `TK_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Khach hang demo",
+    mst: record.mst || "",
+    diaChi: record.diaChi || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    email: record.email || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const supplierWithDefaults = (record: (typeof suppliers)[number], index: number) => ({
+    ...record,
+    MA_NCC: record.MA_NCC || `NCC_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "Nha cung cap demo",
+    mst: record.mst || "",
+    diaChi: record.diaChi || "",
+    nguoiLienHe: record.nguoiLienHe || "",
+    dienThoai: record.dienThoai || "",
+    email: record.email || "",
+    ghiChu: record.ghiChu || "",
+  });
+  const productWithDefaults = (record: (typeof products)[number], index: number) => ({
+    ...record,
+    MA_SP: record.MA_SP || `SP_DEMO${String(index + 1).padStart(3, "0")}`,
+    ten: record.ten || "San pham demo",
+    dvt: record.dvt || "kg",
+    vat: record.vat || 0,
+  });
   const withDefaults = (record: (typeof purchases)[number], index: number) => {
     const soLuong = record.soLuong || 0;
     const donGia = record.donGia || 0;
@@ -38,6 +79,20 @@ function Page() {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
         setRows(mergeDemoRows(purchases, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
+      })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([
+      listMergedDemoRows("customers", customers, (row) => row.MA_KH, customerWithDefaults),
+      listMergedDemoRows("suppliers", suppliers, (row) => row.MA_NCC, supplierWithDefaults),
+      listMergedDemoRows("products", products, (row) => row.MA_SP, productWithDefaults),
+    ])
+      .then(([nextCustomers, nextSuppliers, nextProducts]) => {
+        setCustomerRows(nextCustomers);
+        setSupplierRows(nextSuppliers);
+        setProductRows(nextProducts);
       })
       .catch(console.error);
   }, []);
