@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, sales, fmtVND, fmtDate } from "@/lib/mock-data";
-import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/ban-hang")({ component: Page });
@@ -52,13 +52,20 @@ function Page() {
   };
 
   useEffect(() => {
-    listDemoRecords<(typeof sales)[number]>("sales")
-      .then((demoRows) => {
+    Promise.all([listDemoRecords<(typeof sales)[number]>("sales"), listDeletedDemoKeys("sales")])
+      .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
-        setRows(mergeDemoRows(sales, safeRows, (row) => row.MA_CHUNG_TU));
+        const deleted = new Set(deletedKeys);
+        setRows(mergeDemoRows(sales, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
       })
       .catch(console.error);
   }, []);
+
+  const handleDelete = (recordKey: string) => {
+    if (!window.confirm(`Xóa chứng từ ${recordKey}?`)) return;
+    setRows((current) => current.filter((row) => row.MA_CHUNG_TU !== recordKey));
+    void deleteDemoRecord("sales", recordKey).catch(console.error);
+  };
 
   return (
     <DataTable
@@ -98,11 +105,19 @@ function Page() {
           key: "actions",
           label: "Thao tác",
           width: 90,
-          render: () => (
+          render: (row) => (
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Eye className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" />
               <Pencil className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" />
-              <Trash2 className="w-3.5 h-3.5 cursor-pointer hover:text-destructive" />
+              <button
+                type="button"
+                onClick={() => handleDelete(row.MA_CHUNG_TU)}
+                className="inline-flex h-5 w-5 items-center justify-center hover:text-destructive"
+                aria-label="Xóa"
+                title="Xóa"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </div>
           ),
         },

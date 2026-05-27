@@ -9,6 +9,13 @@ type DemoEnvelope<T> = {
   record: T;
 };
 
+type SupabaseListResponse<T> = T[] | { value?: T[] };
+
+function unwrapRows<T>(response: SupabaseListResponse<T> | null) {
+  if (!response) return [];
+  return Array.isArray(response) ? response : response.value ?? [];
+}
+
 function getRestUrl(path: string) {
   if (!supabaseUrl) throw new Error("Missing VITE_SUPABASE_URL");
   return `${supabaseUrl.replace(/\/$/, "")}/rest/v1/${path}`;
@@ -38,9 +45,10 @@ async function supabaseRequest<T>(path: string, init?: RequestInit) {
 
 export async function listDemoRecords<T>(tableName: string) {
   if (!isSupabaseConfigured) return [];
-  const rows = await supabaseRequest<DemoEnvelope<T>[]>(
+  const response = await supabaseRequest<SupabaseListResponse<DemoEnvelope<T>>>(
     `demo_records?table_name=eq.${encodeURIComponent(tableName)}&select=record&order=updated_at.desc`,
   );
+  const rows = unwrapRows(response);
   return rows.map((row) => row.record);
 }
 
@@ -53,7 +61,7 @@ export async function saveDemoRecord<T>(tableName: string, recordKey: string, re
     updated_at: new Date().toISOString(),
   };
 
-  const rows = await supabaseRequest<DemoEnvelope<T>[]>(
+  const response = await supabaseRequest<SupabaseListResponse<DemoEnvelope<T>>>(
     "demo_records?on_conflict=table_name,record_key",
     {
       method: "POST",
@@ -61,8 +69,30 @@ export async function saveDemoRecord<T>(tableName: string, recordKey: string, re
       body: JSON.stringify(payload),
     },
   );
+  const rows = unwrapRows(response);
 
   return rows[0]?.record ?? record;
+}
+
+export async function listDeletedDemoKeys(tableName: string) {
+  if (!isSupabaseConfigured) return [];
+  const response = await supabaseRequest<SupabaseListResponse<DemoEnvelope<{ deleted: boolean }>>>(
+    `demo_records?table_name=eq.${encodeURIComponent(`${tableName}:deleted`)}&select=record_key`,
+  );
+  return unwrapRows(response).map((row) => row.record_key);
+}
+
+export async function deleteDemoRecord(tableName: string, recordKey: string) {
+  if (!isSupabaseConfigured) return;
+  await saveDemoRecord(`${tableName}:deleted`, recordKey, { deleted: true });
+  try {
+    await supabaseRequest<null>(
+      `demo_records?table_name=eq.${encodeURIComponent(tableName)}&record_key=eq.${encodeURIComponent(recordKey)}`,
+      { method: "DELETE" },
+    );
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
 export function mergeDemoRows<T>(baseRows: T[], demoRows: T[], keyOf: (row: T) => string) {

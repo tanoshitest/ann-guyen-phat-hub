@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
-import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import { Trash2 } from "lucide-react";
 import {
   customers,
   expenses,
@@ -41,13 +42,20 @@ function Page() {
   });
 
   useEffect(() => {
-    listDemoRecords<(typeof expenses)[number]>("expenses")
-      .then((demoRows) => {
+    Promise.all([listDemoRecords<(typeof expenses)[number]>("expenses"), listDeletedDemoKeys("expenses")])
+      .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
-        setRows(mergeDemoRows(expenses, safeRows, (row) => row.MA_CHI_PHI));
+        const deleted = new Set(deletedKeys);
+        setRows(mergeDemoRows(expenses, safeRows, (row) => row.MA_CHI_PHI).filter((row) => !deleted.has(row.MA_CHI_PHI)));
       })
       .catch(console.error);
   }, []);
+
+  const handleDelete = (recordKey: string) => {
+    if (!window.confirm(`Xóa chi phí ${recordKey}?`)) return;
+    setRows((current) => current.filter((row) => row.MA_CHI_PHI !== recordKey));
+    void deleteDemoRecord("expenses", recordKey).catch(console.error);
+  };
 
   return (
     <DataTable
@@ -71,6 +79,22 @@ function Page() {
         { key: "lyDo", label: "Lý do chi", width: 200 },
         { key: "soTien", label: "Số tiền", width: 130, numeric: true, render: (r) => fmtVND(r.soTien) },
         { key: "ghiChu", label: "Ghi chú", width: 160 },
+        {
+          key: "actions",
+          label: "Thao tÃ¡c",
+          width: 80,
+          render: (row) => (
+            <button
+              type="button"
+              onClick={() => handleDelete(row.MA_CHI_PHI)}
+              className="inline-flex h-5 w-5 items-center justify-center text-muted-foreground hover:text-destructive"
+              aria-label="Xóa"
+              title="Xóa"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          ),
+        },
       ]}
     />
   );

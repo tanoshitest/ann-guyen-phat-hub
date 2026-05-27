@@ -15,6 +15,7 @@ alter table public.demo_records enable row level security;
 drop policy if exists "demo_records_select" on public.demo_records;
 drop policy if exists "demo_records_insert" on public.demo_records;
 drop policy if exists "demo_records_update" on public.demo_records;
+drop policy if exists "demo_records_delete" on public.demo_records;
 
 create policy "demo_records_select"
 on public.demo_records for select
@@ -28,3 +29,7 @@ create policy "demo_records_update"
 on public.demo_records for update
 using (true)
 with check (true);
+
+create policy "demo_records_delete"
+on public.demo_records for delete
+using (true);

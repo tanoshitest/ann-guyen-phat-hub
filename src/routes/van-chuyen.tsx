@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, shippers, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
-import { listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import { deleteDemoRecord, listDeletedDemoKeys, listDemoRecords, mergeDemoRows, saveDemoRecord } from "@/lib/supabase-demo";
+import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/van-chuyen")({ component: Page });
 
@@ -31,13 +32,20 @@ function Page() {
   };
 
   useEffect(() => {
-    listDemoRecords<(typeof shippings)[number]>("shippings")
-      .then((demoRows) => {
+    Promise.all([listDemoRecords<(typeof shippings)[number]>("shippings"), listDeletedDemoKeys("shippings")])
+      .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
-        setRows(mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU));
+        const deleted = new Set(deletedKeys);
+        setRows(mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
       })
       .catch(console.error);
   }, []);
+
+  const handleDelete = (recordKey: string) => {
+    if (!window.confirm(`Xóa chứng từ ${recordKey}?`)) return;
+    setRows((current) => current.filter((row) => row.MA_CHUNG_TU !== recordKey));
+    void deleteDemoRecord("shippings", recordKey).catch(console.error);
+  };
 
   return (
     <DataTable
@@ -68,6 +76,22 @@ function Page() {
         { key: "ghiChu", label: "Ghi chú", width: 160 },
         { key: "ngayHD", label: "Ngày HĐ", width: 95, render: (r) => fmtDate(r.ngayHD) },
         { key: "soHD", label: "Số HĐ", width: 90 },
+        {
+          key: "actions",
+          label: "Thao tÃ¡c",
+          width: 80,
+          render: (row) => (
+            <button
+              type="button"
+              onClick={() => handleDelete(row.MA_CHUNG_TU)}
+              className="inline-flex h-5 w-5 items-center justify-center text-muted-foreground hover:text-destructive"
+              aria-label="Xóa"
+              title="Xóa"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          ),
+        },
       ]}
     />
   );
