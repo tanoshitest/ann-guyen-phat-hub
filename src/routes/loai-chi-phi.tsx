@@ -9,10 +9,9 @@ function Page() {
     <DataTable
       title="Danh mục loại chi phí"
       data={expenseTypes}
-      searchKeys={["MA_LOAI_CP", "ten"]}
+      searchKeys={["ten"]}
       onAdd={() => {}}
       columns={[
-        { key: "MA_LOAI_CP", label: "MA_LOAI_CP", width: 140 },
         { key: "ten", label: "Tên loại chi phí", width: 300 },
       ]}
     />

@@ -1,4 +1,6 @@
 // Mock data for AN NGUYEN PHAT CRM
+const MOCK_ROW_COUNT = 10;
+
 export type Customer = {
   MA_KH: string;
   MA_THONG_KE: string;
@@ -133,7 +135,7 @@ const cusBase = [
 const cities = ["Hà Nội", "TP. HCM", "Hải Phòng", "Đà Nẵng", "Cần Thơ", "Bình Dương", "Đồng Nai", "Bắc Ninh"];
 const names = ["Nguyễn Văn An", "Trần Thị Bích", "Lê Hoàng Nam", "Phạm Minh Tuấn", "Hoàng Thu Hà", "Đỗ Quốc Việt", "Vũ Thanh Sơn", "Bùi Phương Thảo"];
 
-export const customers: Customer[] = cusBase.map(([MA_KH, MA_THONG_KE, ten], i) => ({
+export const customers: Customer[] = cusBase.slice(0, MOCK_ROW_COUNT).map(([MA_KH, MA_THONG_KE, ten], i) => ({
   MA_KH,
   MA_THONG_KE,
   ten,
@@ -163,7 +165,7 @@ const sBase = [
   ["NCC_TRUNG", "Công ty Trung Thành"],
   ["NCC_SON", "Công ty Sơn Hà"],
 ];
-export const suppliers: Supplier[] = sBase.map(([MA_NCC, ten], i) => ({
+export const suppliers: Supplier[] = sBase.slice(0, MOCK_ROW_COUNT).map(([MA_NCC, ten], i) => ({
   MA_NCC,
   ten,
   mst: `0${200000000 + i * 217}`,
@@ -192,7 +194,7 @@ const shBase = [
   ["VC_TRI", "Vận tải Trí Đức"],
   ["VC_QUY", "Vận tải Quý Bảo"],
 ];
-export const shippers: Shipper[] = shBase.map(([MA_VC, ten], i) => ({
+export const shippers: Shipper[] = shBase.slice(0, MOCK_ROW_COUNT).map(([MA_VC, ten], i) => ({
   MA_VC,
   ten,
   mst: `0${300000000 + i * 313}`,
@@ -235,7 +237,7 @@ const prodBase = [
   ["XCA", "Xác cà phê", "kg", 5],
   ["DDU", "Dầu thực vật", "lít", 10],
 ];
-export const products: Product[] = prodBase.map(([MA_SP, ten, dvt, vat]) => ({
+export const products: Product[] = prodBase.slice(0, MOCK_ROW_COUNT).map(([MA_SP, ten, dvt, vat]) => ({
   MA_SP: MA_SP as string,
   ten: ten as string,
   dvt: dvt as string,
@@ -244,13 +246,14 @@ export const products: Product[] = prodBase.map(([MA_SP, ten, dvt, vat]) => ({
 
 // ===== Expense Types =====
 export const expenseTypes: ExpenseType[] = [
-  { MA_LOAI_CP: "CP_VC", ten: "Chi phí vận chuyển" },
+  { MA_LOAI_CP: "CP_BANHANG", ten: "Chi phí bán hàng" },
   { MA_LOAI_CP: "CP_BOCXEP", ten: "Chi phí bốc xếp" },
-  { MA_LOAI_CP: "CP_KHO", ten: "Chi phí kho bãi" },
-  { MA_LOAI_CP: "CP_HOAHONG", ten: "Hoa hồng môi giới" },
-  { MA_LOAI_CP: "CP_XANGDAU", ten: "Xăng dầu" },
-  { MA_LOAI_CP: "CP_DIENNUOC", ten: "Điện nước" },
+  { MA_LOAI_CP: "CP_LO", ten: "Chi phí cho lò" },
+  { MA_LOAI_CP: "CP_CANXE", ten: "Chi phí cân xe" },
+  { MA_LOAI_CP: "CP_QLDN", ten: "Chi phí quản lý doanh nghiệp" },
+  { MA_LOAI_CP: "CP_TAICHINH", ten: "Chi phí tài chính" },
   { MA_LOAI_CP: "CP_KHAC", ten: "Chi phí khác" },
+  { MA_LOAI_CP: "GV_HANGBAN", ten: "Giá vốn hàng bán" },
 ];
 
 // ===== Deterministic PRNG =====
@@ -271,19 +274,24 @@ function dateStr(base: number, offset: number) {
   return d.toISOString().slice(0, 10);
 }
 
+function jumboPair(r: () => number, maxCong: number, maxTru: number) {
+  return r() > 0.5
+    ? { congJumbo: Math.floor(r() * maxCong) * 5000, truJumbo: 0 }
+    : { congJumbo: 0, truJumbo: Math.floor(r() * maxTru) * 5000 };
+}
+
 // ===== Sales =====
 export const sales: Sale[] = (() => {
   const r = rng(7);
   const arr: Sale[] = [];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < MOCK_ROW_COUNT; i++) {
     const cus = customers[Math.floor(r() * customers.length)];
     const p = products[Math.floor(r() * products.length)];
     const sl = Math.floor(r() * 25000) + 1000;
     const dg = Math.floor(r() * 5000) + 2500;
     const gt = sl * dg;
     const tienVat = Math.round((gt * p.vat) / 100);
-    const congJ = Math.floor(r() * 200) * 5000;
-    const truJ = Math.floor(r() * 100) * 5000;
+    const jumbo = jumboPair(r, 200, 100);
     const hh = Math.floor(r() * 500000);
     const status = r();
     arr.push({
@@ -297,9 +305,9 @@ export const sales: Sale[] = (() => {
       giaTriBan: gt,
       vat: p.vat,
       tienVat,
-      tongTT: gt + tienVat + congJ - truJ,
-      congJumbo: congJ,
-      truJumbo: truJ,
+      tongTT: gt + tienVat + jumbo.congJumbo - jumbo.truJumbo,
+      congJumbo: jumbo.congJumbo,
+      truJumbo: jumbo.truJumbo,
       hoaHong: hh,
       dienGiai: `Bán ${p.ten} cho ${cus.ten}`,
       ngayHD: dateStr(0, ((i * 3) % 320) + 2),
@@ -314,12 +322,13 @@ export const sales: Sale[] = (() => {
 export const purchases: Purchase[] = (() => {
   const r = rng(13);
   const arr: Purchase[] = [];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < MOCK_ROW_COUNT; i++) {
     const s = suppliers[Math.floor(r() * suppliers.length)];
     const p = products[Math.floor(r() * products.length)];
     const sl = Math.floor(r() * 25000) + 1000;
     const dg = Math.floor(r() * 4500) + 2000;
     const cus = customers[Math.floor(r() * customers.length)];
+    const jumbo = jumboPair(r, 150, 80);
     arr.push({
       MA_CHUNG_TU: `MUA${pad(i + 1, 6)}`,
       ngay: dateStr(0, (i * 3) % 320),
@@ -330,8 +339,8 @@ export const purchases: Purchase[] = (() => {
       donGia: dg,
       giaTriMua: sl * dg,
       vat: p.vat,
-      congJumbo: Math.floor(r() * 150) * 5000,
-      truJumbo: Math.floor(r() * 80) * 5000,
+      congJumbo: jumbo.congJumbo,
+      truJumbo: jumbo.truJumbo,
       ghiChu: i % 5 === 0 ? "Mua gấp" : "",
       ngayHD: dateStr(0, ((i * 3) % 320) + 1),
       soHD: `1000${pad(i + 1, 4)}`,
@@ -344,7 +353,7 @@ export const purchases: Purchase[] = (() => {
 export const shippings: Shipping[] = (() => {
   const r = rng(19);
   const arr: Shipping[] = [];
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < MOCK_ROW_COUNT; i++) {
     const sh = shippers[Math.floor(r() * shippers.length)];
     const p = products[Math.floor(r() * products.length)];
     const sl = Math.floor(r() * 25000) + 1000;
@@ -374,7 +383,7 @@ export const expenses: Expense[] = (() => {
   const r = rng(23);
   const arr: Expense[] = [];
   const reasons = ["Thanh toán cước", "Bốc xếp hàng", "Thuê kho", "Hoa hồng môi giới", "Đổ xăng xe tải", "Tiền điện kho", "Chi linh tinh"];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < MOCK_ROW_COUNT; i++) {
     const t = expenseTypes[i % expenseTypes.length];
     const cus = customers[Math.floor(r() * customers.length)];
     const refType = Math.floor(r() * 3);

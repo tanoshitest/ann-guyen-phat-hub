@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataTable } from "@/components/DataTable";
-import { sales, fmtVND, fmtDate } from "@/lib/mock-data";
+import { customers, products, sales, fmtVND, fmtDate } from "@/lib/mock-data";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/ban-hang")({ component: Page });
@@ -16,6 +16,10 @@ function StatusBadge({ s }: { s: string }) {
 }
 
 function Page() {
+  const customerOptions = customers.map((customer) => customer.ten);
+  const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
+  const productOptions = products.map((product) => product.MA_SP);
+
   return (
     <DataTable
       title="Bán hàng"
@@ -25,9 +29,9 @@ function Page() {
       columns={[
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },
-        { key: "MA_THONG_KE", label: "MA_THONG_KE", width: 100 },
-        { key: "khachHang", label: "Khách hàng", width: 200 },
-        { key: "maSP", label: "Mã SP", width: 70 },
+        { key: "MA_THONG_KE", label: "MA_THONG_KE", width: 100, options: statisticOptions },
+        { key: "khachHang", label: "Khách hàng", width: 200, options: customerOptions },
+        { key: "maSP", label: "Mã SP", width: 70, options: productOptions },
         { key: "soLuong", label: "SL", width: 80, numeric: true, render: (r) => fmtVND(r.soLuong) },
         { key: "donGia", label: "Đơn giá", width: 90, numeric: true, render: (r) => fmtVND(r.donGia) },
         { key: "giaTriBan", label: "Giá trị bán", width: 120, numeric: true, render: (r) => fmtVND(r.giaTriBan) },
