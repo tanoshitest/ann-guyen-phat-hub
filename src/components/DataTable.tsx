@@ -16,7 +16,7 @@ type Props<T> = {
   data: T[];
   columns: Column<T>[];
   searchKeys?: (keyof T)[];
-  onAdd?: () => void;
+  onAdd?: (record: T) => void;
   toolbar?: ReactNode;
   pageSize?: number;
 };
@@ -103,10 +103,7 @@ export function DataTable<T extends Record<string, any>>({
           </button>
           {onAdd && (
             <button
-              onClick={() => {
-                onAdd();
-                setAddOpen(true);
-              }}
+              onClick={() => setAddOpen(true)}
               className="h-7 px-2 inline-flex items-center gap-1 text-[12px] rounded bg-primary text-primary-foreground hover:opacity-90"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm mới
@@ -189,7 +186,18 @@ export function DataTable<T extends Record<string, any>>({
           </button>
         </div>
       </div>
-      {addOpen && <AddRecordDialog title={title} columns={formColumns} onClose={() => setAddOpen(false)} />}
+      {addOpen && (
+        <AddRecordDialog
+          title={title}
+          columns={formColumns}
+          onClose={() => setAddOpen(false)}
+          onSave={(record) => {
+            onAdd?.(record);
+            setPage(1);
+            setAddOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -198,10 +206,12 @@ function AddRecordDialog<T extends Record<string, any>>({
   title,
   columns,
   onClose,
+  onSave,
 }: {
   title: string;
   columns: Column<T>[];
   onClose: () => void;
+  onSave: (record: T) => void;
 }) {
   const [jumboType, setJumboType] = useState<"cong" | "tru" | null>(null);
   const [congJumbo, setCongJumbo] = useState("");
@@ -214,7 +224,16 @@ function AddRecordDialog<T extends Record<string, any>>({
         className="w-full max-w-4xl max-h-[88vh] overflow-hidden rounded-md border bg-card shadow-lg"
         onSubmit={(e) => {
           e.preventDefault();
-          onClose();
+          const formData = new FormData(e.currentTarget);
+          const record = columns.reduce<Record<string, string | number>>((acc, column) => {
+            const key = String(column.key);
+            if (key === "actions") return acc;
+            const rawValue = formData.get(key);
+            const value = typeof rawValue === "string" ? rawValue : "";
+            acc[key] = column.numeric ? Number(value || 0) : value;
+            return acc;
+          }, {});
+          onSave(record as T);
         }}
       >
         <div className="flex items-center justify-between border-b px-4 py-3">

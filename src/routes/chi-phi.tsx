@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import {
   customers,
@@ -16,6 +17,7 @@ import {
 export const Route = createFileRoute("/chi-phi")({ component: Page });
 
 function Page() {
+  const [rows, setRows] = useState(expenses);
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const objectOptions = [
     ...customers.map((customer) => customer.ten),
@@ -27,13 +29,23 @@ function Page() {
     ...purchases.map((purchase) => purchase.MA_CHUNG_TU),
     ...shippings.map((shipping) => shipping.MA_CHUNG_TU),
   ];
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <DataTable
       title="Chi phí"
-      data={expenses}
+      data={rows}
       searchKeys={["MA_CHI_PHI", "loaiCP", "doiTuong", "MA_CHUNG_TU", "lyDo"]}
-      onAdd={() => {}}
+      onAdd={(record) => {
+        setRows((prev) => [
+          {
+            ...record,
+            MA_CHI_PHI: record.MA_CHI_PHI || `CPDEMO${String(prev.length + 1).padStart(4, "0")}`,
+            ngay: record.ngay || today,
+          },
+          ...prev,
+        ]);
+      }}
       columns={[
         { key: "MA_CHI_PHI", label: "MA_CHI_PHI", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },

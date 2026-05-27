@@ -1,20 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, purchases, suppliers, fmtVND, fmtDate } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/mua-hang")({ component: Page });
 
 function Page() {
+  const [rows, setRows] = useState(purchases);
   const supplierOptions = suppliers.map((supplier) => supplier.ten);
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <DataTable
       title="Mua hàng"
-      data={purchases}
+      data={rows}
       searchKeys={["MA_CHUNG_TU", "ncc", "maSP", "soHD"]}
-      onAdd={() => {}}
+      onAdd={(record) => {
+        setRows((prev) => {
+          const giaTriMua = record.giaTriMua || record.soLuong * record.donGia;
+          return [
+            {
+              ...record,
+              MA_CHUNG_TU: record.MA_CHUNG_TU || `MUADEMO${String(prev.length + 1).padStart(4, "0")}`,
+              ngay: record.ngay || today,
+              giaTriMua,
+              ngayHD: record.ngayHD || record.ngay || today,
+              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+            },
+            ...prev,
+          ];
+        });
+      }}
       columns={[
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },

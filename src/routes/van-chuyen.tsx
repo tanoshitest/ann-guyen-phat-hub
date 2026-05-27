@@ -1,21 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, shippers, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/van-chuyen")({ component: Page });
 
 function Page() {
+  const [rows, setRows] = useState(shippings);
   const shipperOptions = shippers.map((shipper) => shipper.ten);
   const plateOptions = shippers.map((shipper) => shipper.bienSo);
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <DataTable
       title="Vận chuyển"
-      data={shippings}
+      data={rows}
       searchKeys={["MA_CHUNG_TU", "dvvc", "bienSo", "maSP", "soHD"]}
-      onAdd={() => {}}
+      onAdd={(record) => {
+        setRows((prev) => {
+          const giaTriVC = record.giaTriVC || record.soLuong * record.donGia;
+          return [
+            {
+              ...record,
+              MA_CHUNG_TU: record.MA_CHUNG_TU || `VCDEMO${String(prev.length + 1).padStart(4, "0")}`,
+              ngay: record.ngay || today,
+              giaTriVC,
+              ngayHD: record.ngayHD || record.ngay || today,
+              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+            },
+            ...prev,
+          ];
+        });
+      }}
       columns={[
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { DataTable } from "@/components/DataTable";
 import { customers, products, sales, fmtVND, fmtDate } from "@/lib/mock-data";
 import { Eye, Pencil, Trash2 } from "lucide-react";
@@ -16,16 +17,38 @@ function StatusBadge({ s }: { s: string }) {
 }
 
 function Page() {
+  const [rows, setRows] = useState(sales);
   const customerOptions = customers.map((customer) => customer.ten);
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <DataTable
       title="Bán hàng"
-      data={sales}
+      data={rows}
       searchKeys={["MA_CHUNG_TU", "khachHang", "maSP", "soHD", "MA_THONG_KE"]}
-      onAdd={() => {}}
+      onAdd={(record) => {
+        setRows((prev) => {
+          const giaTriBan = record.giaTriBan || record.soLuong * record.donGia;
+          const tienVat = record.tienVat || Math.round((giaTriBan * record.vat) / 100);
+          const tongTT = record.tongTT || giaTriBan + tienVat + record.congJumbo - record.truJumbo;
+          return [
+            {
+              ...record,
+              MA_CHUNG_TU: record.MA_CHUNG_TU || `BANDEMO${String(prev.length + 1).padStart(4, "0")}`,
+              ngay: record.ngay || today,
+              giaTriBan,
+              tienVat,
+              tongTT,
+              ngayHD: record.ngayHD || record.ngay || today,
+              soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
+              trangThai: record.trangThai || prev[0]?.trangThai,
+            },
+            ...prev,
+          ];
+        });
+      }}
       columns={[
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },
