@@ -23,10 +23,40 @@ function Page() {
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
+  const withDefaults = (record: (typeof sales)[number], index: number) => {
+    const soLuong = record.soLuong || 0;
+    const donGia = record.donGia || 0;
+    const vat = record.vat || 0;
+    const congJumbo = record.congJumbo || 0;
+    const truJumbo = record.truJumbo || 0;
+    const giaTriBan = record.giaTriBan || soLuong * donGia;
+    const tienVat = record.tienVat || Math.round((giaTriBan * vat) / 100);
+    return {
+      ...record,
+      MA_CHUNG_TU: record.MA_CHUNG_TU || `BANDEMO${String(index + 1).padStart(4, "0")}`,
+      ngay: record.ngay || today,
+      soLuong,
+      donGia,
+      giaTriBan,
+      vat,
+      tienVat,
+      tongTT: record.tongTT || giaTriBan + tienVat + congJumbo - truJumbo,
+      congJumbo,
+      truJumbo,
+      hoaHong: record.hoaHong || 0,
+      dienGiai: record.dienGiai || "",
+      ngayHD: record.ngayHD || record.ngay || today,
+      soHD: record.soHD || `DEMO${String(index + 1).padStart(6, "0")}`,
+      trangThai: record.trangThai || "Còn nợ",
+    };
+  };
 
   useEffect(() => {
     listDemoRecords<(typeof sales)[number]>("sales")
-      .then((demoRows) => setRows(mergeDemoRows(sales, demoRows, (row) => row.MA_CHUNG_TU)))
+      .then((demoRows) => {
+        const safeRows = demoRows.map((record, index) => withDefaults(record, index));
+        setRows(mergeDemoRows(sales, safeRows, (row) => row.MA_CHUNG_TU));
+      })
       .catch(console.error);
   }, []);
 
@@ -37,20 +67,7 @@ function Page() {
       searchKeys={["MA_CHUNG_TU", "khachHang", "maSP", "soHD", "MA_THONG_KE"]}
       onAdd={(record) => {
         setRows((prev) => {
-          const giaTriBan = record.giaTriBan || record.soLuong * record.donGia;
-          const tienVat = record.tienVat || Math.round((giaTriBan * record.vat) / 100);
-          const tongTT = record.tongTT || giaTriBan + tienVat + record.congJumbo - record.truJumbo;
-          const next = {
-            ...record,
-            MA_CHUNG_TU: record.MA_CHUNG_TU || `BANDEMO${String(prev.length + 1).padStart(4, "0")}`,
-            ngay: record.ngay || today,
-            giaTriBan,
-            tienVat,
-            tongTT,
-            ngayHD: record.ngayHD || record.ngay || today,
-            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-            trangThai: record.trangThai || prev[0]?.trangThai,
-          };
+          const next = withDefaults(record, prev.length);
           void saveDemoRecord("sales", next.MA_CHUNG_TU, next).catch(console.error);
           return [
             next,

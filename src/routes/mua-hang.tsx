@@ -12,10 +12,31 @@ function Page() {
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
+  const withDefaults = (record: (typeof purchases)[number], index: number) => {
+    const soLuong = record.soLuong || 0;
+    const donGia = record.donGia || 0;
+    return {
+      ...record,
+      MA_CHUNG_TU: record.MA_CHUNG_TU || `MUADEMO${String(index + 1).padStart(4, "0")}`,
+      ngay: record.ngay || today,
+      soLuong,
+      donGia,
+      giaTriMua: record.giaTriMua || soLuong * donGia,
+      vat: record.vat || 0,
+      congJumbo: record.congJumbo || 0,
+      truJumbo: record.truJumbo || 0,
+      ghiChu: record.ghiChu || "",
+      ngayHD: record.ngayHD || record.ngay || today,
+      soHD: record.soHD || `DEMO${String(index + 1).padStart(6, "0")}`,
+    };
+  };
 
   useEffect(() => {
     listDemoRecords<(typeof purchases)[number]>("purchases")
-      .then((demoRows) => setRows(mergeDemoRows(purchases, demoRows, (row) => row.MA_CHUNG_TU)))
+      .then((demoRows) => {
+        const safeRows = demoRows.map((record, index) => withDefaults(record, index));
+        setRows(mergeDemoRows(purchases, safeRows, (row) => row.MA_CHUNG_TU));
+      })
       .catch(console.error);
   }, []);
 
@@ -26,15 +47,7 @@ function Page() {
       searchKeys={["MA_CHUNG_TU", "ncc", "maSP", "soHD"]}
       onAdd={(record) => {
         setRows((prev) => {
-          const giaTriMua = record.giaTriMua || record.soLuong * record.donGia;
-          const next = {
-            ...record,
-            MA_CHUNG_TU: record.MA_CHUNG_TU || `MUADEMO${String(prev.length + 1).padStart(4, "0")}`,
-            ngay: record.ngay || today,
-            giaTriMua,
-            ngayHD: record.ngayHD || record.ngay || today,
-            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-          };
+          const next = withDefaults(record, prev.length);
           void saveDemoRecord("purchases", next.MA_CHUNG_TU, next).catch(console.error);
           return [
             next,

@@ -13,10 +13,29 @@ function Page() {
   const statisticOptions = customers.map((customer) => customer.MA_THONG_KE);
   const productOptions = products.map((product) => product.MA_SP);
   const today = new Date().toISOString().slice(0, 10);
+  const withDefaults = (record: (typeof shippings)[number], index: number) => {
+    const soLuong = record.soLuong || 0;
+    const donGia = record.donGia || 0;
+    return {
+      ...record,
+      MA_CHUNG_TU: record.MA_CHUNG_TU || `VCDEMO${String(index + 1).padStart(4, "0")}`,
+      ngay: record.ngay || today,
+      soLuong,
+      donGia,
+      giaTriVC: record.giaTriVC || soLuong * donGia,
+      vat: record.vat || 0,
+      ghiChu: record.ghiChu || "",
+      ngayHD: record.ngayHD || record.ngay || today,
+      soHD: record.soHD || `DEMO${String(index + 1).padStart(6, "0")}`,
+    };
+  };
 
   useEffect(() => {
     listDemoRecords<(typeof shippings)[number]>("shippings")
-      .then((demoRows) => setRows(mergeDemoRows(shippings, demoRows, (row) => row.MA_CHUNG_TU)))
+      .then((demoRows) => {
+        const safeRows = demoRows.map((record, index) => withDefaults(record, index));
+        setRows(mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU));
+      })
       .catch(console.error);
   }, []);
 
@@ -27,15 +46,7 @@ function Page() {
       searchKeys={["MA_CHUNG_TU", "dvvc", "bienSo", "maSP", "soHD"]}
       onAdd={(record) => {
         setRows((prev) => {
-          const giaTriVC = record.giaTriVC || record.soLuong * record.donGia;
-          const next = {
-            ...record,
-            MA_CHUNG_TU: record.MA_CHUNG_TU || `VCDEMO${String(prev.length + 1).padStart(4, "0")}`,
-            ngay: record.ngay || today,
-            giaTriVC,
-            ngayHD: record.ngayHD || record.ngay || today,
-            soHD: record.soHD || `DEMO${String(prev.length + 1).padStart(6, "0")}`,
-          };
+          const next = withDefaults(record, prev.length);
           void saveDemoRecord("shippings", next.MA_CHUNG_TU, next).catch(console.error);
           return [
             next,
