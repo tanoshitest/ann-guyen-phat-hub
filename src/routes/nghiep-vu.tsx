@@ -95,12 +95,20 @@ const emptyExpenseLine: ExpenseLine = {
 
 function emptyProductLine(index = 1): ProductLine {
   return {
-    id: `line-${Date.now()}-${index}`,
+    id: `line-${index}`,
     maSP: "",
     soLuong: 0,
     donGia: 0,
     giaTri: 0,
   };
+}
+
+function nextProductLine(lines: ProductLine[] = []) {
+  const maxIndex = lines.reduce((value, line) => {
+    const match = line.id.match(/^line-(\d+)$/);
+    return match ? Math.max(value, Number(match[1])) : value;
+  }, 0);
+  return emptyProductLine(maxIndex + 1);
 }
 
 function today() {
@@ -241,10 +249,7 @@ function Page() {
   const addProductLine = (section: "banLines" | "muaLines") => {
     setForm((current) => ({
       ...current,
-      [section]: [
-        ...(current[section] ?? []),
-        emptyProductLine((current[section]?.length ?? 0) + 1),
-      ],
+      [section]: [...(current[section] ?? []), nextProductLine(current[section])],
     }));
   };
 
