@@ -1,9 +1,10 @@
 {
+  "installCommand": "npm install",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
