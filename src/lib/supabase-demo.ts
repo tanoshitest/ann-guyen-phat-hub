@@ -3,6 +3,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undef
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
+const storagePrefix = "an-nguyen-phat-demo";
+
 type DemoEnvelope<T> = {
   table_name: string;
   record_key: string;
@@ -14,6 +16,46 @@ type SupabaseListResponse<T> = T[] | { value?: T[] };
 function unwrapRows<T>(response: SupabaseListResponse<T> | null) {
   if (!response) return [];
   return Array.isArray(response) ? response : response.value ?? [];
+}
+
+function canUseLocalStorage() {
+  return typeof window !== "undefined" && Boolean(window.localStorage);
+}
+
+function getStorageKey(tableName: string) {
+  return `${storagePrefix}:${tableName}`;
+}
+
+function readLocalRecords<T>(tableName: string) {
+  if (!canUseLocalStorage()) return [];
+  const raw = window.localStorage.getItem(getStorageKey(tableName));
+  if (!raw) return [];
+  try {
+    return (JSON.parse(raw) as DemoEnvelope<T>[]).map((row) => row.record);
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalRecord<T>(tableName: string, recordKey: string, record: T) {
+  if (!canUseLocalStorage()) return record;
+  const key = getStorageKey(tableName);
+  const raw = window.localStorage.getItem(key);
+  const rows = raw ? (JSON.parse(raw) as DemoEnvelope<T>[]) : [];
+  const nextRows = [
+    { table_name: tableName, record_key: recordKey, record },
+    ...rows.filter((row) => row.record_key !== recordKey),
+  ];
+  window.localStorage.setItem(key, JSON.stringify(nextRows));
+  return record;
+}
+
+function deleteLocalRecord(tableName: string, recordKey: string) {
+  if (!canUseLocalStorage()) return;
+  const key = getStorageKey(tableName);
+  const raw = window.localStorage.getItem(key);
+  const rows = raw ? (JSON.parse(raw) as DemoEnvelope<unknown>[]) : [];
+  window.localStorage.setItem(key, JSON.stringify(rows.filter((row) => row.record_key !== recordKey)));
 }
 
 function getRestUrl(path: string) {
@@ -44,7 +86,7 @@ async function supabaseRequest<T>(path: string, init?: RequestInit) {
 }
 
 export async function listDemoRecords<T>(tableName: string) {
-  if (!isSupabaseConfigured) return [];
+  if (!isSupabaseConfigured) return readLocalRecords<T>(tableName);
   const response = await supabaseRequest<SupabaseListResponse<DemoEnvelope<T>>>(
     `demo_records?table_name=eq.${encodeURIComponent(tableName)}&select=record&order=updated_at.desc`,
   );
@@ -53,7 +95,7 @@ export async function listDemoRecords<T>(tableName: string) {
 }
 
 export async function saveDemoRecord<T>(tableName: string, recordKey: string, record: T) {
-  if (!isSupabaseConfigured) return record;
+  if (!isSupabaseConfigured) return writeLocalRecord(tableName, recordKey, record);
   const payload = {
     table_name: tableName,
     record_key: recordKey,
@@ -83,7 +125,11 @@ export async function listDeletedDemoKeys(tableName: string) {
 }
 
 export async function deleteDemoRecord(tableName: string, recordKey: string) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured) {
+    writeLocalRecord(`${tableName}:deleted`, recordKey, { deleted: true });
+    deleteLocalRecord(tableName, recordKey);
+    return;
+  }
   await saveDemoRecord(`${tableName}:deleted`, recordKey, { deleted: true });
   try {
     await supabaseRequest<null>(

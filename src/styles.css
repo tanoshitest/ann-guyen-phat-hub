@@ -79,7 +79,7 @@
   }
   html, body {
     font-family: var(--font-sans);
-    font-size: 14px;
+    font-size: 16.8px;
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
@@ -93,7 +93,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  font-size: 15.6px;
 }
 .sheet-table thead th {
   position: sticky;
@@ -129,6 +129,53 @@
   height: 24px;
   border: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: 15.6px;
   outline: none;
+}
+
+[class~="text-[10px]"] {
+  font-size: 12px !important;
+}
+
+[class~="text-[11px]"] {
+  font-size: 13px !important;
+}
+
+[class~="text-[12px]"] {
+  font-size: 14.4px !important;
+}
+
+[class~="text-[13px]"] {
+  font-size: 15.6px !important;
+}
+
+[class~="text-[15px]"] {
+  font-size: 18px !important;
+}
+
+[class~="text-xs"] {
+  font-size: 0.9rem !important;
+}
+
+[class~="text-sm"] {
+  font-size: 1.05rem !important;
+}
+
+[class~="text-base"] {
+  font-size: 1.2rem !important;
+}
+
+input,
+select,
+textarea,
+button {
+  font-size: inherit;
+}
+
+.h-7 {
+  height: 2.1rem !important;
+}
+
+.h-8 {
+  height: 2.4rem !important;
 }

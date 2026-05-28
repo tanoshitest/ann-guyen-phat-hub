@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VanChuyenRouteImport } from './routes/van-chuyen'
 import { Route as SanPhamRouteImport } from './routes/san-pham'
 import { Route as NhaCungCapRouteImport } from './routes/nha-cung-cap'
+import { Route as NghiepVuRouteImport } from './routes/nghiep-vu'
 import { Route as MuaHangRouteImport } from './routes/mua-hang'
 import { Route as LoaiChiPhiRouteImport } from './routes/loai-chi-phi'
 import { Route as KhoHoaDonRouteImport } from './routes/kho-hoa-don'
@@ -42,6 +43,11 @@ const SanPhamRoute = SanPhamRouteImport.update({
 const NhaCungCapRoute = NhaCungCapRouteImport.update({
   id: '/nha-cung-cap',
   path: '/nha-cung-cap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NghiepVuRoute = NghiepVuRouteImport.update({
+  id: '/nghiep-vu',
+  path: '/nghiep-vu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MuaHangRoute = MuaHangRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
+  '/nghiep-vu': typeof NghiepVuRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
+  '/nghiep-vu': typeof NghiepVuRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/kho-hoa-don': typeof KhoHoaDonRoute
   '/loai-chi-phi': typeof LoaiChiPhiRoute
   '/mua-hang': typeof MuaHangRoute
+  '/nghiep-vu': typeof NghiepVuRoute
   '/nha-cung-cap': typeof NhaCungCapRoute
   '/san-pham': typeof SanPhamRoute
   '/van-chuyen': typeof VanChuyenRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
+    | '/nghiep-vu'
     | '/nha-cung-cap'
     | '/san-pham'
     | '/van-chuyen'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
+    | '/nghiep-vu'
     | '/nha-cung-cap'
     | '/san-pham'
     | '/van-chuyen'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/kho-hoa-don'
     | '/loai-chi-phi'
     | '/mua-hang'
+    | '/nghiep-vu'
     | '/nha-cung-cap'
     | '/san-pham'
     | '/van-chuyen'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   KhoHoaDonRoute: typeof KhoHoaDonRoute
   LoaiChiPhiRoute: typeof LoaiChiPhiRoute
   MuaHangRoute: typeof MuaHangRoute
+  NghiepVuRoute: typeof NghiepVuRoute
   NhaCungCapRoute: typeof NhaCungCapRoute
   SanPhamRoute: typeof SanPhamRoute
   VanChuyenRoute: typeof VanChuyenRoute
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/nha-cung-cap'
       fullPath: '/nha-cung-cap'
       preLoaderRoute: typeof NhaCungCapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nghiep-vu': {
+      id: '/nghiep-vu'
+      path: '/nghiep-vu'
+      fullPath: '/nghiep-vu'
+      preLoaderRoute: typeof NghiepVuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mua-hang': {
@@ -432,6 +452,7 @@ const rootRouteChildren: RootRouteChildren = {
   KhoHoaDonRoute: KhoHoaDonRoute,
   LoaiChiPhiRoute: LoaiChiPhiRoute,
   MuaHangRoute: MuaHangRoute,
+  NghiepVuRoute: NghiepVuRoute,
   NhaCungCapRoute: NhaCungCapRoute,
   SanPhamRoute: SanPhamRoute,
   VanChuyenRoute: VanChuyenRoute,

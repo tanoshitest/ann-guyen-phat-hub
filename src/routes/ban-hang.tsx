@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
-import { customers, products, sales, fmtVND, fmtDate } from "@/lib/mock-data";
+import { customers, products, operationDemoSales as sales, fmtVND, fmtDate } from "@/lib/mock-data";
 import {
   deleteDemoRecord,
   listDeletedDemoKeys,
@@ -85,7 +85,11 @@ function Page() {
       .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
-        setRows(mergeDemoRows(sales, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
+        setRows(
+          mergeDemoRows(sales, safeRows, (row) => row.MA_CHUNG_TU).filter(
+            (row) => !deleted.has(row.MA_CHUNG_TU),
+          ),
+        );
       })
       .catch(console.error);
   }, []);
@@ -117,10 +121,7 @@ function Page() {
         setRows((prev) => {
           const next = withDefaults(record, prev.length);
           void saveDemoRecord("sales", next.MA_CHUNG_TU, next).catch(console.error);
-          return [
-            next,
-            ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU),
-          ];
+          return [next, ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU)];
         });
       }}
       columns={[
@@ -130,18 +131,65 @@ function Page() {
         { key: "khachHang", label: "Khách hàng", width: 200, options: customerOptions },
         { key: "maSP", label: "Mã SP", width: 70, options: productOptions },
         { key: "soLuong", label: "SL", width: 80, numeric: true, render: (r) => fmtVND(r.soLuong) },
-        { key: "donGia", label: "Đơn giá", width: 90, numeric: true, render: (r) => fmtVND(r.donGia) },
-        { key: "giaTriBan", label: "Giá trị bán", width: 120, numeric: true, render: (r) => fmtVND(r.giaTriBan) },
+        {
+          key: "donGia",
+          label: "Đơn giá",
+          width: 90,
+          numeric: true,
+          render: (r) => fmtVND(r.donGia),
+        },
+        {
+          key: "giaTriBan",
+          label: "Giá trị bán",
+          width: 120,
+          numeric: true,
+          render: (r) => fmtVND(r.giaTriBan),
+        },
         { key: "vat", label: "VAT%", width: 60, numeric: true },
-        { key: "tienVat", label: "Tiền VAT", width: 100, numeric: true, render: (r) => fmtVND(r.tienVat) },
-        { key: "tongTT", label: "Tổng TT", width: 120, numeric: true, render: (r) => fmtVND(r.tongTT) },
-        { key: "congJumbo", label: "Cộng Jumbo", width: 100, numeric: true, render: (r) => fmtVND(r.congJumbo) },
-        { key: "truJumbo", label: "Trừ Jumbo", width: 100, numeric: true, render: (r) => fmtVND(r.truJumbo) },
-        { key: "hoaHong", label: "Hoa hồng", width: 100, numeric: true, render: (r) => fmtVND(r.hoaHong) },
+        {
+          key: "tienVat",
+          label: "Tiền VAT",
+          width: 100,
+          numeric: true,
+          render: (r) => fmtVND(r.tienVat),
+        },
+        {
+          key: "tongTT",
+          label: "Tổng TT",
+          width: 120,
+          numeric: true,
+          render: (r) => fmtVND(r.tongTT),
+        },
+        {
+          key: "congJumbo",
+          label: "Cộng Jumbo",
+          width: 100,
+          numeric: true,
+          render: (r) => fmtVND(r.congJumbo),
+        },
+        {
+          key: "truJumbo",
+          label: "Trừ Jumbo",
+          width: 100,
+          numeric: true,
+          render: (r) => fmtVND(r.truJumbo),
+        },
+        {
+          key: "hoaHong",
+          label: "Hoa hồng",
+          width: 100,
+          numeric: true,
+          render: (r) => fmtVND(r.hoaHong),
+        },
         { key: "dienGiai", label: "Diễn giải", width: 240 },
         { key: "ngayHD", label: "Ngày HĐ", width: 95, render: (r) => fmtDate(r.ngayHD) },
         { key: "soHD", label: "Số HĐ", width: 90 },
-        { key: "trangThai", label: "Trạng thái", width: 120, render: (r) => <StatusBadge s={r.trangThai} /> },
+        {
+          key: "trangThai",
+          label: "Trạng thái",
+          width: 120,
+          render: (r) => <StatusBadge s={r.trangThai} />,
+        },
         {
           key: "actions",
           label: "Thao tác",

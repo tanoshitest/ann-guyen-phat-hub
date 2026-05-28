@@ -7,6 +7,7 @@ import {
   Receipt,
   Wallet,
   FileText,
+  ClipboardList,
   Users,
   Building2,
   Box,
@@ -27,6 +28,7 @@ const groups: Group[] = [
   {
     label: "Nghiệp vụ",
     items: [
+      { to: "/nghiep-vu", label: "Form Nhập", icon: <ClipboardList className="w-4 h-4" /> },
       { to: "/ban-hang", label: "Bán hàng", icon: <ShoppingCart className="w-4 h-4" /> },
       { to: "/mua-hang", label: "Mua hàng", icon: <PackagePlus className="w-4 h-4" /> },
       { to: "/van-chuyen", label: "Vận chuyển", icon: <Truck className="w-4 h-4" /> },

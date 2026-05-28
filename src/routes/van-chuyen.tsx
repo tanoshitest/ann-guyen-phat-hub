@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DataTable } from "@/components/DataTable";
-import { customers, products, shippers, shippings, fmtVND, fmtDate } from "@/lib/mock-data";
+import {
+  customers,
+  products,
+  shippers,
+  operationDemoShippings as shippings,
+  fmtVND,
+  fmtDate,
+} from "@/lib/mock-data";
 import {
   deleteDemoRecord,
   listDeletedDemoKeys,
@@ -72,11 +79,18 @@ function Page() {
   };
 
   useEffect(() => {
-    Promise.all([listDemoRecords<(typeof shippings)[number]>("shippings"), listDeletedDemoKeys("shippings")])
+    Promise.all([
+      listDemoRecords<(typeof shippings)[number]>("shippings"),
+      listDeletedDemoKeys("shippings"),
+    ])
       .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
-        setRows(mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU).filter((row) => !deleted.has(row.MA_CHUNG_TU)));
+        setRows(
+          mergeDemoRows(shippings, safeRows, (row) => row.MA_CHUNG_TU).filter(
+            (row) => !deleted.has(row.MA_CHUNG_TU),
+          ),
+        );
       })
       .catch(console.error);
   }, []);
@@ -110,10 +124,7 @@ function Page() {
         setRows((prev) => {
           const next = withDefaults(record, prev.length);
           void saveDemoRecord("shippings", next.MA_CHUNG_TU, next).catch(console.error);
-          return [
-            next,
-            ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU),
-          ];
+          return [next, ...prev.filter((row) => row.MA_CHUNG_TU !== next.MA_CHUNG_TU)];
         });
       }}
       columns={[
@@ -124,8 +135,20 @@ function Page() {
         { key: "bienSo", label: "Biển số xe", width: 110, options: plateOptions },
         { key: "maSP", label: "Mã SP", width: 70, options: productOptions },
         { key: "soLuong", label: "SL", width: 80, numeric: true, render: (r) => fmtVND(r.soLuong) },
-        { key: "donGia", label: "Đơn giá", width: 90, numeric: true, render: (r) => fmtVND(r.donGia) },
-        { key: "giaTriVC", label: "Giá trị VC", width: 120, numeric: true, render: (r) => fmtVND(r.giaTriVC) },
+        {
+          key: "donGia",
+          label: "Đơn giá",
+          width: 90,
+          numeric: true,
+          render: (r) => fmtVND(r.donGia),
+        },
+        {
+          key: "giaTriVC",
+          label: "Giá trị VC",
+          width: 120,
+          numeric: true,
+          render: (r) => fmtVND(r.giaTriVC),
+        },
         { key: "vat", label: "VAT%", width: 60, numeric: true },
         { key: "ghiChu", label: "Ghi chú", width: 160 },
         { key: "ngayHD", label: "Ngày HĐ", width: 95, render: (r) => fmtDate(r.ngayHD) },

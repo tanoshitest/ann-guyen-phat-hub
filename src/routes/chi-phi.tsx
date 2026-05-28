@@ -13,12 +13,12 @@ import {
 import { Trash2 } from "lucide-react";
 import {
   customers,
-  expenses,
+  operationDemoExpenses as expenses,
   expenseTypes,
-  purchases,
-  sales,
+  operationDemoPurchases as purchases,
+  operationDemoSales as sales,
   shippers,
-  shippings,
+  operationDemoShippings as shippings,
   suppliers,
   fmtVND,
   fmtDate,
@@ -92,11 +92,18 @@ function Page() {
   });
 
   useEffect(() => {
-    Promise.all([listDemoRecords<(typeof expenses)[number]>("expenses"), listDeletedDemoKeys("expenses")])
+    Promise.all([
+      listDemoRecords<(typeof expenses)[number]>("expenses"),
+      listDeletedDemoKeys("expenses"),
+    ])
       .then(([demoRows, deletedKeys]) => {
         const safeRows = demoRows.map((record, index) => withDefaults(record, index));
         const deleted = new Set(deletedKeys);
-        setRows(mergeDemoRows(expenses, safeRows, (row) => row.MA_CHI_PHI).filter((row) => !deleted.has(row.MA_CHI_PHI)));
+        setRows(
+          mergeDemoRows(expenses, safeRows, (row) => row.MA_CHI_PHI).filter(
+            (row) => !deleted.has(row.MA_CHI_PHI),
+          ),
+        );
       })
       .catch(console.error);
   }, []);
@@ -106,7 +113,12 @@ function Page() {
       listMergedDemoRows("customers", customers, (row) => row.MA_KH, customerWithDefaults),
       listMergedDemoRows("suppliers", suppliers, (row) => row.MA_NCC, supplierWithDefaults),
       listMergedDemoRows("shippers", shippers, (row) => row.MA_VC, shipperWithDefaults),
-      listMergedDemoRows("expense_types", expenseTypes, (row) => row.MA_LOAI_CP, expenseTypeWithDefaults),
+      listMergedDemoRows(
+        "expense_types",
+        expenseTypes,
+        (row) => row.MA_LOAI_CP,
+        expenseTypeWithDefaults,
+      ),
     ])
       .then(([nextCustomers, nextSuppliers, nextShippers, nextExpenseTypes]) => {
         setCustomerRows(nextCustomers);
@@ -138,12 +150,23 @@ function Page() {
       columns={[
         { key: "MA_CHI_PHI", label: "MA_CHI_PHI", width: 110 },
         { key: "ngay", label: "Ngày CT", width: 95, render: (r) => fmtDate(r.ngay) },
-        { key: "loaiCP", label: "Loại chi phí", width: 170, options: uniqueOptions(expenseTypeRows.map((type) => type.ten)) },
+        {
+          key: "loaiCP",
+          label: "Loại chi phí",
+          width: 170,
+          options: uniqueOptions(expenseTypeRows.map((type) => type.ten)),
+        },
         { key: "doiTuong", label: "Đối tượng", width: 200, options: objectOptions },
         { key: "MA_CHUNG_TU", label: "MA_CHUNG_TU", width: 110, options: documentOptions },
         { key: "MA_THONG_KE", label: "MA_THONG_KE", width: 110, options: statisticOptions },
         { key: "lyDo", label: "Lý do chi", width: 200 },
-        { key: "soTien", label: "Số tiền", width: 130, numeric: true, render: (r) => fmtVND(r.soTien) },
+        {
+          key: "soTien",
+          label: "Số tiền",
+          width: 130,
+          numeric: true,
+          render: (r) => fmtVND(r.soTien),
+        },
         { key: "ghiChu", label: "Ghi chú", width: 160 },
         {
           key: "actions",

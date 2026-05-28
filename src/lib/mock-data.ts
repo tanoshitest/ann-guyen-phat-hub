@@ -132,20 +132,40 @@ const cusBase = [
   ["KH_SG", "TK_SG", "Công ty Sài Gòn Mới"],
   ["KH_VL", "TK_VL", "Công ty Vĩnh Long"],
 ];
-const cities = ["Hà Nội", "TP. HCM", "Hải Phòng", "Đà Nẵng", "Cần Thơ", "Bình Dương", "Đồng Nai", "Bắc Ninh"];
-const names = ["Nguyễn Văn An", "Trần Thị Bích", "Lê Hoàng Nam", "Phạm Minh Tuấn", "Hoàng Thu Hà", "Đỗ Quốc Việt", "Vũ Thanh Sơn", "Bùi Phương Thảo"];
+const cities = [
+  "Hà Nội",
+  "TP. HCM",
+  "Hải Phòng",
+  "Đà Nẵng",
+  "Cần Thơ",
+  "Bình Dương",
+  "Đồng Nai",
+  "Bắc Ninh",
+];
+const names = [
+  "Nguyễn Văn An",
+  "Trần Thị Bích",
+  "Lê Hoàng Nam",
+  "Phạm Minh Tuấn",
+  "Hoàng Thu Hà",
+  "Đỗ Quốc Việt",
+  "Vũ Thanh Sơn",
+  "Bùi Phương Thảo",
+];
 
-export const customers: Customer[] = cusBase.slice(0, MOCK_ROW_COUNT).map(([MA_KH, MA_THONG_KE, ten], i) => ({
-  MA_KH,
-  MA_THONG_KE,
-  ten,
-  mst: `0${100000000 + i * 137}`,
-  diaChi: `${10 + i} Đường Lê Lợi, ${cities[i % cities.length]}`,
-  nguoiLienHe: names[i % names.length],
-  dienThoai: `09${String(10000000 + i * 731923).slice(0, 8)}`,
-  email: `info@${MA_KH.toLowerCase()}.vn`,
-  ghiChu: i % 3 === 0 ? "Khách VIP" : "",
-}));
+export const customers: Customer[] = cusBase
+  .slice(0, MOCK_ROW_COUNT)
+  .map(([MA_KH, MA_THONG_KE, ten], i) => ({
+    MA_KH,
+    MA_THONG_KE,
+    ten,
+    mst: `0${100000000 + i * 137}`,
+    diaChi: `${10 + i} Đường Lê Lợi, ${cities[i % cities.length]}`,
+    nguoiLienHe: names[i % names.length],
+    dienThoai: `09${String(10000000 + i * 731923).slice(0, 8)}`,
+    email: `info@${MA_KH.toLowerCase()}.vn`,
+    ghiChu: i % 3 === 0 ? "Khách VIP" : "",
+  }));
 
 // ===== Suppliers =====
 const sBase = [
@@ -237,12 +257,14 @@ const prodBase = [
   ["XCA", "Xác cà phê", "kg", 5],
   ["DDU", "Dầu thực vật", "lít", 10],
 ];
-export const products: Product[] = prodBase.slice(0, MOCK_ROW_COUNT).map(([MA_SP, ten, dvt, vat]) => ({
-  MA_SP: MA_SP as string,
-  ten: ten as string,
-  dvt: dvt as string,
-  vat: vat as number,
-}));
+export const products: Product[] = prodBase
+  .slice(0, MOCK_ROW_COUNT)
+  .map(([MA_SP, ten, dvt, vat]) => ({
+    MA_SP: MA_SP as string,
+    ten: ten as string,
+    dvt: dvt as string,
+    vat: vat as number,
+  }));
 
 // ===== Expense Types =====
 export const expenseTypes: ExpenseType[] = [
@@ -382,7 +404,15 @@ export const shippings: Shipping[] = (() => {
 export const expenses: Expense[] = (() => {
   const r = rng(23);
   const arr: Expense[] = [];
-  const reasons = ["Thanh toán cước", "Bốc xếp hàng", "Thuê kho", "Hoa hồng môi giới", "Đổ xăng xe tải", "Tiền điện kho", "Chi linh tinh"];
+  const reasons = [
+    "Thanh toán cước",
+    "Bốc xếp hàng",
+    "Thuê kho",
+    "Hoa hồng môi giới",
+    "Đổ xăng xe tải",
+    "Tiền điện kho",
+    "Chi linh tinh",
+  ];
   for (let i = 0; i < MOCK_ROW_COUNT; i++) {
     const t = expenseTypes[i % expenseTypes.length];
     const cus = customers[Math.floor(r() * customers.length)];
@@ -397,7 +427,12 @@ export const expenses: Expense[] = (() => {
       MA_CHI_PHI: `CP${pad(i + 1, 7)}`,
       ngay: dateStr(0, (i * 2) % 320),
       loaiCP: t.ten,
-      doiTuong: refType === 2 ? shippers[i % shippers.length].ten : refType === 1 ? suppliers[i % suppliers.length].ten : cus.ten,
+      doiTuong:
+        refType === 2
+          ? shippers[i % shippers.length].ten
+          : refType === 1
+            ? suppliers[i % suppliers.length].ten
+            : cus.ten,
       MA_CHUNG_TU: ref,
       MA_THONG_KE: cus.MA_THONG_KE,
       lyDo: reasons[i % reasons.length],
@@ -407,6 +442,197 @@ export const expenses: Expense[] = (() => {
   }
   return arr;
 })();
+
+export type OperationMoneyLine = {
+  soLuong: number;
+  donGia: number;
+  giaTri: number;
+  congJumbo: number;
+  truJumbo: number;
+  ghiChu: string;
+};
+
+export type OperationExpenseLine = {
+  loaiCP: string;
+  doiTuong: string;
+  lyDo: string;
+  soLuong: number;
+  donGia: number;
+  congChiPhi: number;
+  soTien: number;
+  ghiChu: string;
+};
+
+export type OperationDemo = {
+  soChungTu: string;
+  ngay: string;
+  maThongKe: string;
+  maKH: string;
+  khachHang: string;
+  maSP: string;
+  maNCC: string;
+  ncc: string;
+  maVC: string;
+  dvvc: string;
+  bienSo: string;
+  ban: OperationMoneyLine;
+  mua: OperationMoneyLine;
+  vc: OperationMoneyLine;
+  chiPhi: OperationExpenseLine;
+  ghiChu: string;
+  createdAt: string;
+};
+
+export const operationDemos: OperationDemo[] = Array.from({ length: MOCK_ROW_COUNT }, (_, i) => {
+  const customer = customers[i % customers.length];
+  const supplier = suppliers[(i + 2) % suppliers.length];
+  const shipper = shippers[(i + 1) % shippers.length];
+  const product = products[(i + 3) % products.length];
+  const soLuong = 5000 + i * 1250;
+  const donGiaBan = 5200 + i * 180;
+  const donGiaMua = 4100 + i * 140;
+  const donGiaVC = 220 + i * 12;
+  const congJumbo = i % 2 === 0 ? 50000 + i * 10000 : 0;
+  const truJumbo = i % 2 === 1 ? 30000 + i * 5000 : 0;
+  const cpSoLuong = 1 + (i % 3);
+  const cpDonGia = 350000 + i * 45000;
+  const congChiPhi = i % 4 === 0 ? 120000 : 0;
+  const soChungTu = `NV${pad(i + 1, 6)}`;
+  const ngay = dateStr(0, i * 5);
+
+  return {
+    soChungTu,
+    ngay,
+    maThongKe: customer.MA_THONG_KE,
+    maKH: customer.MA_KH,
+    khachHang: customer.ten,
+    maSP: product.MA_SP,
+    maNCC: supplier.MA_NCC,
+    ncc: supplier.ten,
+    maVC: shipper.MA_VC,
+    dvvc: shipper.ten,
+    bienSo: shipper.bienSo,
+    ban: {
+      soLuong,
+      donGia: donGiaBan,
+      giaTri: soLuong * donGiaBan,
+      congJumbo,
+      truJumbo,
+      ghiChu: `Bán ${product.ten}`,
+    },
+    mua: {
+      soLuong,
+      donGia: donGiaMua,
+      giaTri: soLuong * donGiaMua,
+      congJumbo,
+      truJumbo,
+      ghiChu: `Mua ${product.ten}`,
+    },
+    vc: {
+      soLuong,
+      donGia: donGiaVC,
+      giaTri: soLuong * donGiaVC,
+      congJumbo,
+      truJumbo,
+      ghiChu: `Vận chuyển ${product.ten}`,
+    },
+    chiPhi: {
+      loaiCP: expenseTypes[i % expenseTypes.length].ten,
+      doiTuong: i % 2 === 0 ? shipper.ten : supplier.ten,
+      lyDo: i % 2 === 0 ? "Bốc xếp và vận chuyển" : "Chi phí mua hàng",
+      soLuong: cpSoLuong,
+      donGia: cpDonGia,
+      congChiPhi,
+      soTien: cpSoLuong * cpDonGia + congChiPhi,
+      ghiChu: `Chi phí cho ${soChungTu}`,
+    },
+    ghiChu: `Nghiệp vụ demo ${i + 1}`,
+    createdAt: new Date(2025, 0, 1 + i).toISOString(),
+  };
+});
+
+export const operationDemoSales: Sale[] = operationDemos.map((operation) => {
+  const product = products.find((item) => item.MA_SP === operation.maSP);
+  const vat = product?.vat ?? 0;
+  const tienVat = Math.round((operation.ban.giaTri * vat) / 100);
+
+  return {
+    MA_CHUNG_TU: operation.soChungTu,
+    ngay: operation.ngay,
+    MA_THONG_KE: operation.maThongKe,
+    khachHang: operation.khachHang,
+    maSP: operation.maSP,
+    soLuong: operation.ban.soLuong,
+    donGia: operation.ban.donGia,
+    giaTriBan: operation.ban.giaTri,
+    vat,
+    tienVat,
+    tongTT: operation.ban.giaTri + tienVat + operation.ban.congJumbo - operation.ban.truJumbo,
+    congJumbo: operation.ban.congJumbo,
+    truJumbo: operation.ban.truJumbo,
+    hoaHong: 0,
+    dienGiai: operation.ban.ghiChu,
+    ngayHD: operation.ngay,
+    soHD: operation.soChungTu,
+    trangThai: iStatus(operation.soChungTu),
+  };
+});
+
+export const operationDemoPurchases: Purchase[] = operationDemos.map((operation) => {
+  const product = products.find((item) => item.MA_SP === operation.maSP);
+
+  return {
+    MA_CHUNG_TU: operation.soChungTu,
+    ngay: operation.ngay,
+    MA_THONG_KE: operation.maThongKe,
+    ncc: operation.ncc,
+    maSP: operation.maSP,
+    soLuong: operation.mua.soLuong,
+    donGia: operation.mua.donGia,
+    giaTriMua: operation.mua.giaTri,
+    vat: product?.vat ?? 0,
+    congJumbo: operation.mua.congJumbo,
+    truJumbo: operation.mua.truJumbo,
+    ghiChu: operation.mua.ghiChu,
+    ngayHD: operation.ngay,
+    soHD: operation.soChungTu,
+  };
+});
+
+export const operationDemoShippings: Shipping[] = operationDemos.map((operation) => ({
+  MA_CHUNG_TU: operation.soChungTu,
+  ngay: operation.ngay,
+  MA_THONG_KE: operation.maThongKe,
+  dvvc: operation.dvvc,
+  bienSo: operation.bienSo,
+  maSP: operation.maSP,
+  soLuong: operation.vc.soLuong,
+  donGia: operation.vc.donGia,
+  giaTriVC: operation.vc.giaTri,
+  vat: 8,
+  ghiChu: operation.vc.ghiChu,
+  ngayHD: operation.ngay,
+  soHD: operation.soChungTu,
+}));
+
+export const operationDemoExpenses: Expense[] = operationDemos.map((operation) => ({
+  MA_CHI_PHI: `CP_${operation.soChungTu}`,
+  ngay: operation.ngay,
+  loaiCP: operation.chiPhi.loaiCP,
+  doiTuong: operation.chiPhi.doiTuong,
+  MA_CHUNG_TU: operation.soChungTu,
+  MA_THONG_KE: operation.maThongKe,
+  lyDo: operation.chiPhi.lyDo,
+  soTien: operation.chiPhi.soTien,
+  ghiChu: operation.chiPhi.ghiChu,
+}));
+
+function iStatus(documentNumber: string): Sale["trangThai"] {
+  const n = Number(documentNumber.slice(-2));
+  if (n % 3 === 0) return "Đã thanh toán";
+  if (n % 3 === 1) return "Còn nợ";
+  return "Quá hạn";
+}
 
 export function fmtVND(n?: number | string | null) {
   const value = typeof n === "number" ? n : Number(n ?? 0);
